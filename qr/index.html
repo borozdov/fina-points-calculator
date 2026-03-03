@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>QR — FINA Points Borozdov</title>
+    <meta name="robots" content="noindex">
+
+    <!-- PWA & Icons -->
+    <link rel="icon" href="/assets/img/favicon.png" type="image/png">
+    <link rel="icon" href="/assets/img/icon-192.png" type="image/png" sizes="192x192">
+    <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#101014">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FINA QR">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===== Tokens ===== */
+        :root {
+            --font: 'Inter', system-ui, -apple-system, sans-serif;
+            --r: 20px;
+        }
+
+        [data-theme="dark"] {
+            --bg: #101014;
+            --sf: #1a1a22;
+            --sf2: #22222e;
+            --brd: rgba(255, 255, 255, 0.06);
+            --txt: #e8e8ed;
+            --dim: #7a7a8a;
+            --ac: #c8a2ff;
+            --ac-d: rgba(200, 162, 255, 0.14);
+            --ac-g: rgba(200, 162, 255, 0.2);
+        }
+
+        [data-theme="light"] {
+            --bg: #f4f4f8;
+            --sf: #ffffff;
+            --sf2: #eeeef2;
+            --brd: rgba(0, 0, 0, 0.08);
+            --txt: #1a1a2e;
+            --dim: #6b6b80;
+            --ac: #8b5cf6;
+            --ac-d: rgba(139, 92, 246, 0.12);
+            --ac-g: rgba(139, 92, 246, 0.2);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--txt);
+            transition: background 0.3s, color 0.3s;
+            -webkit-font-smoothing: antialiased;
+            overflow: hidden;
+        }
+
+        /* ===== Layout ===== */
+        .page {
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* ===== Card ===== */
+        .card {
+            background: var(--sf);
+            border: 1px solid var(--brd);
+            border-radius: var(--r);
+            padding: 24px;
+            box-shadow: 0 12px 64px rgba(0, 0, 0, 0.4);
+            max-width: 340px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            text-align: center;
+            animation: appear 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes appear {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        [data-theme="light"] .card {
+            box-shadow: 0 12px 64px rgba(0, 0, 0, 0.08);
+        }
+
+        /* ===== Logo ===== */
+        .logo {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--ac);
+            letter-spacing: -0.04em;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ===== QR wrapper ===== */
+        .qr-wrap {
+            background: var(--sf2);
+            border: 1px solid var(--brd);
+            border-radius: 16px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            max-width: 240px;
+        }
+
+        /* Decorative corners */
+        .corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-color: var(--ac);
+            border-style: solid;
+            border-radius: 4px;
+        }
+
+        .lt {
+            top: 8px;
+            left: 8px;
+            border-width: 2.5px 0 0 2.5px;
+        }
+
+        .rt {
+            top: 8px;
+            right: 8px;
+            border-width: 2.5px 2.5px 0 0;
+        }
+
+        .lb {
+            bottom: 8px;
+            left: 8px;
+            border-width: 0 0 2.5px 2.5px;
+        }
+
+        .rb {
+            bottom: 8px;
+            right: 8px;
+            border-width: 0 2.5px 2.5px 0;
+        }
+
+        #qr-container,
+        #qr-container img,
+        #qr-container canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        /* ===== Text ===== */
+        .info {
+            margin-top: 2px;
+        }
+
+        .title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--txt);
+        }
+
+        .subtitle {
+            font-size: 0.8rem;
+            color: var(--dim);
+            margin-top: 2px;
+            font-weight: 500;
+        }
+
+        /* ===== URL chip ===== */
+        .url-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--ac-d);
+            border: 1px solid var(--ac-g);
+            border-radius: 100px;
+            padding: 6px 14px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--ac);
+            text-decoration: none;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .url-chip:hover {
+            background: var(--ac-g);
+            transform: translateY(-2px);
+        }
+
+        /* ===== Actions row ===== */
+        .actions-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--ac);
+            border: none;
+            border-radius: 100px;
+            padding: 8px 18px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            font-family: var(--font);
+            color: var(--bg);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px var(--ac-g);
+        }
+
+        .share-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* ===== Toast ===== */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--sf);
+            color: var(--txt);
+            border: 1px solid var(--brd);
+            border-radius: 10px;
+            padding: 8px 18px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            font-family: var(--font);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ===== Tags ===== */
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        .tag {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--dim);
+            background: var(--bg);
+            border: 1px solid var(--brd);
+            border-radius: 6px;
+            padding: 3px 8px;
+        }
+
+        .divider {
+            width: 100%;
+            height: 1px;
+            background: var(--brd);
+        }
+
+        /* ===== Actions ===== */
+        .theme-btn,
+        .back-btn {
+            position: fixed;
+            top: 16px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--sf);
+            border: 1px solid var(--brd);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            color: var(--txt);
+            text-decoration: none;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+
+        .theme-btn {
+            right: 16px;
+        }
+
+        .back-btn {
+            left: 16px;
+        }
+
+        .theme-btn:hover,
+        .back-btn:hover {
+            border-color: var(--ac);
+            color: var(--ac);
+        }
+
+        @media (max-height: 500px) {
+            .page {
+                padding: 10px;
+            }
+
+            .card {
+                flex-direction: row;
+                max-width: 500px;
+                padding: 16px;
+                gap: 20px;
+            }
+
+            .qr-wrap {
+                width: 160px;
+                height: 160px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <a href="/" class="back-btn" aria-label="Назад" title="Назад">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+    </a>
+    <button class="theme-btn" id="theme-btn" aria-label="Тема">🌙</button>
+
+    <main class="page">
+        <article class="card">
+            <a href="https://fina.borozdov.ru/" class="logo">
+                <span>🏊</span> FINA Points Borozdov
+            </a>
+
+            <div class="qr-wrap">
+                <div class="corner lt"></div>
+                <div class="corner rt"></div>
+                <div class="corner lb"></div>
+                <div class="corner rb"></div>
+                <div id="qr-container"></div>
+            </div>
+
+            <div class="info">
+                <p class="title">Калькулятор очков FINA</p>
+                <p class="subtitle">Отсканируй, чтобы открыть сайт</p>
+            </div>
+
+            <div class="actions-row">
+                <a href="https://fina.borozdov.ru/" class="url-chip">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M2 12h20" />
+                        <path
+                            d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                    </svg>
+                    fina.borozdov.ru
+                </a>
+                <button type="button" class="share-btn" id="share-qr-btn" aria-label="Поделиться">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                        <polyline points="16 6 12 2 8 6"></polyline>
+                        <line x1="12" y1="2" x2="12" y2="15"></line>
+                    </svg>
+                    Поделиться
+                </button>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="tags">
+                <span class="tag">📱 PWA</span>
+                <span class="tag">⚡ OFF-LINE</span>
+                <span class="tag">🏆 RECORDS</span>
+            </div>
+        </article>
+    </main>
+
+    <div class="toast" id="toast">Ссылка скопирована!</div>
+
+    <!-- QR Library -->
+    <script src="/js/lib/qrcode.min.js"></script>
+    <script>
+
+        // --- Theme logic ---
+        const themeBtn = document.getElementById('theme-btn');
+        let currentTheme = localStorage.getItem('fina_theme') ||
+            (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+
+        function updateTheme(t) {
+            document.documentElement.setAttribute('data-theme', t);
+            themeBtn.textContent = t === 'dark' ? '🌙' : '☀️';
+            renderQR();
+        }
+
+        let qrInstance = null;
+
+        function renderQR() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const color = isDark ? '#c8a2ff' : '#8b5cf6';
+            const bg = isDark ? '#22222e' : '#eeeef2';
+            const container = document.getElementById('qr-container');
+
+            container.innerHTML = '';
+            qrInstance = new QRCode(container, {
+                text: "https://fina.borozdov.ru/",
+                width: 200,
+                height: 200,
+                colorDark: color,
+                colorLight: bg,
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        }
+
+        themeBtn.addEventListener('click', () => {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('fina_theme', currentTheme);
+            updateTheme(currentTheme);
+        });
+
+        // Initialize
+        updateTheme(currentTheme);
+
+        // --- Share button ---
+        document.getElementById('share-qr-btn').addEventListener('click', async () => {
+            const shareData = {
+                title: 'Калькулятор очков FINA',
+                text: '🏊 Калькулятор очков FINA — расчёт очков по времени и времени по очкам. Работает оффлайн!',
+                url: 'https://fina.borozdov.ru/'
+            };
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                } else {
+                    await navigator.clipboard.writeText(shareData.text + '\n\n' + shareData.url);
+                    showToast();
+                }
+            } catch (e) {
+                if (e.name !== 'AbortError') {
+                    try {
+                        await navigator.clipboard.writeText('https://fina.borozdov.ru/');
+                    } catch (_) { }
+                    showToast();
+                }
+            }
+        });
+
+        function showToast() {
+            const t = document.getElementById('toast');
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+    </script>
+</body>
+
+</html>

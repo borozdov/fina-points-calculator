@@ -1,0 +1,56 @@
+{
+    "name": "FINA Points Borozdov",
+    "short_name": "FINA Calc",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#101014",
+    "theme_color": "#c8a2ff",
+    "description": "Калькулятор очков FINA с поддержкой нормативов по плаванию",
+    "lang": "ru",
+    "dir": "ltr",
+    "categories": [
+        "sports",
+        "utilities"
+    ],
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "./assets/img/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "./assets/img/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Время → Очки",
+            "short_name": "Время→Очки",
+            "url": "/?mode=time",
+            "description": "Рассчитать очки FINA по времени",
+            "icons": [
+                {
+                    "src": "./assets/img/icon-192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "Очки → Время",
+            "short_name": "Очки→Время",
+            "url": "/?mode=points",
+            "description": "Рассчитать время по очкам FINA",
+            "icons": [
+                {
+                    "src": "./assets/img/icon-192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ]
+}

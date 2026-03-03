@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://fina.borozdov.ru/sitemap.xml
