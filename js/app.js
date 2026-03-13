@@ -37,102 +37,146 @@ class App {
     $ = id => document.getElementById(id);
 
     initDOM() {
-        this.styleGrid = this.$('style-grid');
-        this.grid = this.$('event-grid');
-        this.fTime = this.$('f-time');
-        this.fPts = this.$('f-pts');
-        this.tM = this.$('t-m');
-        this.tS = this.$('t-s');
-        this.tH = this.$('t-h');
-        this.tQ = this.$('t-quick');
-        this.rPts = this.$('r-pts');
-        this.rPtsV = this.$('r-pts-v');
-        this.rPtsWr = this.$('r-pts-wr');
-        this.favPts = this.$('fav-pts');
-        this.rPtsRank = this.$('r-pts-rank');
-        this.pIn = this.$('p-in');
-        this.rTime = this.$('r-time');
-        this.rTimeV = this.$('r-time-v');
-        this.rTimeWr = this.$('r-time-wr');
-        this.favTime = this.$('fav-time');
-        this.rTimeRank = this.$('r-time-rank');
-        this.histList = this.$('history-list');
-        this.favToggle = this.$('fav-toggle');
-        this.historySection = this.$('history-section');
+        const get = id => this.$(id);
+        this.styleGrid = get('style-grid');
+        this.grid = get('event-grid');
+        this.fTime = get('f-time');
+        this.fPts = get('f-pts');
+        this.tM = get('t-m');
+        this.tS = get('t-s');
+        this.tH = get('t-h');
+        this.tQ = get('t-quick');
+        this.rPts = get('r-pts');
+        this.rPtsV = get('r-pts-v');
+        this.rPtsWr = get('r-pts-wr');
+        this.favPts = get('fav-pts');
+        this.rPtsRank = get('r-pts-rank');
+        this.pIn = get('p-in');
+        this.rTime = get('r-time');
+        this.rTimeV = get('r-time-v');
+        this.rTimeWr = get('r-time-wr');
+        this.favTime = get('fav-time');
+        this.rTimeRank = get('r-time-rank');
+        this.histList = get('history-list');
+        this.favToggle = get('fav-toggle');
+        this.historySection = get('history-section');
 
-        this.sharePtsBtn = this.$('share-pts');
-        this.shareTimeBtn = this.$('share-time');
-        this.toastEl = this.$('toast');
+        this.sharePtsBtn = get('share-pts');
+        this.shareTimeBtn = get('share-time');
+        this.toastEl = get('toast');
 
-        this.themeToggle = this.$('theme-toggle');
-        this.themeIcon = this.$('theme-icon');
-        this.colorToggle = this.$('color-toggle');
-        this.colorPicker = this.$('color-picker');
+        this.themeToggle = get('theme-toggle');
+        this.themeIcon = get('theme-icon');
+        this.colorToggle = get('color-toggle');
+        this.colorPicker = get('color-picker');
     }
 
     bindEvents() {
-        this.setupSeg('.row [aria-labelledby="pool-label"]', 'pool', v => { this.state.pool = v; this.fillEvents(); });
-        this.setupSeg('.row [aria-labelledby="gender-label"]', 'gender', v => { this.state.gender = v; this.fillEvents(); });
-
-        document.querySelectorAll('.mode-seg .seg-btn').forEach(b => b.onclick = () => {
-            document.querySelectorAll('.mode-seg .seg-btn').forEach(x => { x.classList.remove('active'); x.setAttribute('aria-checked', 'false'); });
-            b.classList.add('active'); b.setAttribute('aria-checked', 'true');
-            this.state.curMode = b.dataset.mode;
-            this.fTime.classList.toggle('hidden', this.state.curMode !== 'time');
-            this.fPts.classList.toggle('hidden', this.state.curMode !== 'points');
-        });
-
-        this.fTime.onsubmit = e => { e.preventDefault(); if (document.activeElement?.tagName === 'INPUT') document.activeElement.blur(); };
-        this.fPts.onsubmit = e => { e.preventDefault(); if (document.activeElement?.tagName === 'INPUT') document.activeElement.blur(); };
-
-        [this.tM, this.tS, this.tH].forEach((f, i, a) => {
-            f.oninput = () => {
-                f.value = f.value.replace(/\D/g, '').slice(0, 2);
-                this.tQ.value = '';
-                if (f.value.length === 2 && i < a.length - 1) { a[i + 1].focus(); a[i + 1].select(); }
-                this.autoCalcPoints();
+        if (this.themeToggle) {
+            this.themeToggle.onclick = () => {
+                const cur = document.documentElement.getAttribute('data-theme');
+                this.setTheme(cur === 'dark' ? 'light' : 'dark');
             };
-        });
+        }
 
-        this.tQ.oninput = () => { this.tM.value = ''; this.tS.value = ''; this.tH.value = ''; this.autoCalcPoints(); };
-        this.pIn.oninput = () => { if (this.pIn.value.length > 4) this.pIn.value = this.pIn.value.slice(0, 4); this.autoCalcTime(); };
+        if (this.colorToggle && this.colorPicker) {
+            this.colorToggle.onclick = (e) => {
+                e.stopPropagation();
+                this.colorPicker.classList.toggle('hidden');
+            };
+            
+            // Close color picker when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!this.colorPicker.classList.contains('hidden') && 
+                    !this.colorPicker.contains(e.target) && 
+                    e.target !== this.colorToggle) {
+                    this.colorPicker.classList.add('hidden');
+                }
+            });
 
-        this.themeToggle.onclick = () => {
-            const cur = document.documentElement.getAttribute('data-theme');
-            this.setTheme(cur === 'dark' ? 'light' : 'dark');
-        };
+            this.colorPicker.querySelectorAll('.color-dot').forEach(d => {
+                d.onclick = (e) => {
+                    e.stopPropagation();
+                    this.setAccent(d.dataset.color);
+                    this.colorPicker.classList.add('hidden');
+                };
+            });
+        }
 
-        this.colorToggle.onclick = () => this.colorPicker.classList.toggle('hidden');
-        this.colorPicker.querySelectorAll('.color-dot').forEach(d => {
-            d.onclick = () => this.setAccent(d.dataset.color);
-        });
+        if (this.fTime) {
+            this.setupSeg('.row [aria-labelledby="pool-label"]', 'pool', v => { this.state.pool = v; this.fillEvents(); });
+            this.setupSeg('.row [aria-labelledby="gender-label"]', 'gender', v => { this.state.gender = v; this.fillEvents(); });
 
-        this.favPts.onclick = () => {
-            if (!this.rPts.classList.contains('ok')) return;
-            let t = this.tQ.value.trim() ? parseT(this.tQ.value) : this.fieldT();
+            document.querySelectorAll('.mode-seg .seg-btn').forEach(b => b.onclick = () => {
+                document.querySelectorAll('.mode-seg .seg-btn').forEach(x => { x.classList.remove('active'); x.setAttribute('aria-checked', 'false'); });
+                b.classList.add('active'); b.setAttribute('aria-checked', 'true');
+                this.state.curMode = b.dataset.mode;
+                if (this.fTime) this.fTime.classList.toggle('hidden', this.state.curMode !== 'time');
+                if (this.fPts) this.fPts.classList.toggle('hidden', this.state.curMode !== 'points');
+            });
+
+            this.fTime.onsubmit = e => { e.preventDefault(); if (document.activeElement?.tagName === 'INPUT') document.activeElement.blur(); };
+            if (this.fPts) this.fPts.onsubmit = e => { e.preventDefault(); if (document.activeElement?.tagName === 'INPUT') document.activeElement.blur(); };
+
+            [this.tM, this.tS, this.tH].forEach((f, i, a) => {
+                if (!f) return;
+                f.oninput = () => {
+                    f.value = f.value.replace(/\D/g, '').slice(0, 2);
+                    if (this.tQ) this.tQ.value = '';
+                    if (f.value.length === 2 && i < a.length - 1 && a[i + 1]) { a[i + 1].focus(); a[i + 1].select(); }
+                    this.autoCalcPoints();
+                };
+                f.onkeydown = e => { if (e.key === 'Enter') f.blur(); };
+            });
+
+            if (this.tQ) {
+                this.tQ.oninput = () => { 
+                    if (this.tM) this.tM.value = ''; 
+                    if (this.tS) this.tS.value = ''; 
+                    if (this.tH) this.tH.value = ''; 
+                    this.autoCalcPoints(); 
+                };
+                this.tQ.onkeydown = e => { if (e.key === 'Enter') this.tQ.blur(); };
+            }
+            if (this.pIn) {
+                this.pIn.oninput = () => { 
+                    if (this.pIn.value.length > 4) this.pIn.value = this.pIn.value.slice(0, 4); 
+                    this.autoCalcTime(); 
+                };
+                this.pIn.onkeydown = e => { if (e.key === 'Enter') this.pIn.blur(); };
+            }
+        }
+
+        if (this.favPts) this.favPts.onclick = () => {
+            if (!this.rPts || !this.rPts.classList.contains('ok')) return;
+            let t = (this.tQ && this.tQ.value.trim()) ? parseT(this.tQ.value) : this.fieldT();
             this.toggleFav(`⏱ ${fmt(t)}`, RU[this.state.curEvent] || this.state.curEvent, `${this.rPtsV.textContent} очк.`, {
                 mode: this.state.curMode, pool: this.state.pool, gender: this.state.gender, eventKey: this.state.curEvent, value: t
             });
         };
 
-        this.favTime.onclick = () => {
-            if (!this.rTime.classList.contains('ok')) return;
+        if (this.favTime) this.favTime.onclick = () => {
+            if (!this.rTime || !this.rTime.classList.contains('ok')) return;
             this.toggleFav(`🎯 ${this.pIn.value} очк.`, RU[this.state.curEvent] || this.state.curEvent, this.rTimeV.textContent, {
                 mode: this.state.curMode, pool: this.state.pool, gender: this.state.gender, eventKey: this.state.curEvent, value: +this.pIn.value
             });
         };
 
-        this.$('clear-history').onclick = () => {
-            this.state.favs = [];
-            StorageManager.clearFavs();
-            this.renderFavs();
-        };
+        if (this.$('clear-history')) {
+            this.$('clear-history').onclick = () => {
+                this.state.favs = [];
+                StorageManager.clearFavs();
+                this.renderFavs();
+            };
+        }
 
-        this.favToggle.onclick = () => this.historySection.classList.toggle('collapsed');
-        this.favToggle.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') this.favToggle.click(); };
+        if (this.favToggle) {
+            this.favToggle.onclick = () => this.historySection && this.historySection.classList.toggle('collapsed');
+            this.favToggle.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') this.favToggle.click(); };
+        }
 
-        this.sharePtsBtn.onclick = () => this.shareResult('pts');
-        this.shareTimeBtn.onclick = () => this.shareResult('time');
+        if (this.sharePtsBtn) this.sharePtsBtn.onclick = () => this.shareResult('pts');
+        if (this.shareTimeBtn) this.shareTimeBtn.onclick = () => this.shareResult('time');
     }
 
     setupSeg(sel, attr, cb) {
@@ -151,7 +195,7 @@ class App {
             const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
             this.setTheme(prefersLight ? 'light' : 'dark');
         }
-        this.setAccent(StorageManager.getAccent() || 'purple');
+        this.setAccent(StorageManager.getAccent() || 'mono');
     }
 
     setTheme(t) {
