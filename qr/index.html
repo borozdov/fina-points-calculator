@@ -21,6 +21,22 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <script>
+        (function () {
+            try {
+                var theme = localStorage.getItem('fina_theme');
+                if (!theme) {
+                    theme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+                }
+                document.documentElement.setAttribute('data-theme', theme);
+
+                var accent = localStorage.getItem('fina_accent');
+                if (accent) {
+                    document.documentElement.setAttribute('data-accent', accent);
+                }
+            } catch (e) { }
+        })();
+    </script>
     <style>
         /* ===== Tokens ===== */
         :root {
@@ -28,29 +44,35 @@
             --r: 20px;
         }
 
+        /* Dark theme accents */
+        [data-theme="dark"][data-accent="mono"],
         [data-theme="dark"] {
-            --bg: #101014;
-            --sf: #1a1a22;
-            --sf2: #22222e;
-            --brd: rgba(255, 255, 255, 0.06);
-            --txt: #e8e8ed;
-            --dim: #7a7a8a;
-            --ac: #c8a2ff;
-            --ac-d: rgba(200, 162, 255, 0.14);
-            --ac-g: rgba(200, 162, 255, 0.2);
+            --bg: #101014; --sf: #1a1a22; --sf2: #22222e; --brd: rgba(255, 255, 255, 0.06); --txt: #e8e8ed; --dim: #7a7a8a;
+            --ac: #ffffff; --ac-d: rgba(255, 255, 255, 0.14); --ac-g: rgba(255, 255, 255, 0.2);
         }
+        [data-theme="dark"][data-accent="purple"] { --ac: #c8a2ff; --ac-d: rgba(200, 162, 255, 0.14); --ac-g: rgba(200, 162, 255, 0.2); }
+        [data-theme="dark"][data-accent="blue"] { --ac: #6cb4ff; --ac-d: rgba(108, 180, 255, 0.14); --ac-g: rgba(108, 180, 255, 0.2); }
+        [data-theme="dark"][data-accent="green"] { --ac: #6ee7a8; --ac-d: rgba(110, 231, 168, 0.14); --ac-g: rgba(110, 231, 168, 0.2); }
+        [data-theme="dark"][data-accent="orange"] { --ac: #ffb86c; --ac-d: rgba(255, 184, 108, 0.14); --ac-g: rgba(255, 184, 108, 0.2); }
+        [data-theme="dark"][data-accent="pink"] { --ac: #ff7eb3; --ac-d: rgba(255, 126, 179, 0.14); --ac-g: rgba(255, 126, 179, 0.2); }
+        [data-theme="dark"][data-accent="cyan"] { --ac: #67e8f9; --ac-d: rgba(103, 232, 249, 0.14); --ac-g: rgba(103, 232, 249, 0.2); }
+        [data-theme="dark"][data-accent="slate"] { --ac: #cbd5e1; --ac-d: rgba(203, 213, 225, 0.14); --ac-g: rgba(203, 213, 225, 0.2); }
+        [data-theme="dark"][data-accent="zinc"] { --ac: #a1a1aa; --ac-d: rgba(161, 161, 170, 0.14); --ac-g: rgba(161, 161, 170, 0.2); }
 
+        /* Light theme accents */
+        [data-theme="light"][data-accent="mono"],
         [data-theme="light"] {
-            --bg: #f4f4f8;
-            --sf: #ffffff;
-            --sf2: #eeeef2;
-            --brd: rgba(0, 0, 0, 0.08);
-            --txt: #1a1a2e;
-            --dim: #6b6b80;
-            --ac: #8b5cf6;
-            --ac-d: rgba(139, 92, 246, 0.12);
-            --ac-g: rgba(139, 92, 246, 0.2);
+            --bg: #f4f4f8; --sf: #ffffff; --sf2: #eeeef2; --brd: rgba(0, 0, 0, 0.08); --txt: #1a1a2e; --dim: #6b6b80;
+            --ac: #1a1a2e; --ac-d: rgba(26, 26, 46, 0.12); --ac-g: rgba(26, 26, 46, 0.2);
         }
+        [data-theme="light"][data-accent="purple"] { --ac: #8b5cf6; --ac-d: rgba(139, 92, 246, 0.12); --ac-g: rgba(139, 92, 246, 0.2); }
+        [data-theme="light"][data-accent="blue"] { --ac: #3b82f6; --ac-d: rgba(59, 130, 246, 0.12); --ac-g: rgba(59, 130, 246, 0.2); }
+        [data-theme="light"][data-accent="green"] { --ac: #10b981; --ac-d: rgba(16, 185, 129, 0.12); --ac-g: rgba(16, 185, 129, 0.2); }
+        [data-theme="light"][data-accent="orange"] { --ac: #f97316; --ac-d: rgba(249, 115, 22, 0.12); --ac-g: rgba(249, 115, 22, 0.2); }
+        [data-theme="light"][data-accent="pink"] { --ac: #ec4899; --ac-d: rgba(236, 72, 153, 0.12); --ac-g: rgba(236, 72, 153, 0.2); }
+        [data-theme="light"][data-accent="cyan"] { --ac: #06b6d4; --ac-d: rgba(6, 182, 212, 0.12); --ac-g: rgba(6, 182, 212, 0.2); }
+        [data-theme="light"][data-accent="slate"] { --ac: #64748b; --ac-d: rgba(100, 116, 139, 0.12); --ac-g: rgba(100, 116, 139, 0.2); }
+        [data-theme="light"][data-accent="zinc"] { --ac: #52525b; --ac-d: rgba(82, 82, 91, 0.12); --ac-g: rgba(82, 82, 91, 0.2); }
 
         *,
         *::before,
@@ -115,16 +137,29 @@
             box-shadow: 0 12px 64px rgba(0, 0, 0, 0.08);
         }
 
-        /* ===== Logo ===== */
         .logo {
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            line-height: 1;
+            text-align: left;
+        }
+
+        .logo-top {
             font-size: 1.15rem;
             font-weight: 800;
             color: var(--ac);
-            letter-spacing: -0.04em;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .logo-bottom {
+            font-size: 0.55rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--dim);
+            margin-top: 2.5px;
+            opacity: 0.8;
         }
 
         /* ===== QR wrapper ===== */
@@ -366,7 +401,7 @@
 </head>
 
 <body>
-    <a href="/" class="back-btn" aria-label="Назад" title="Назад">
+    <a href="../" class="back-btn" aria-label="Назад" title="Назад">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
             stroke-linecap="round" stroke-linejoin="round">
             <line x1="19" y1="12" x2="5" y2="12"></line>
@@ -378,7 +413,8 @@
     <main class="page">
         <article class="card">
             <a href="https://fina.borozdov.ru/" class="logo">
-                <span>🏊</span> FINA Points Borozdov
+                <span class="logo-top">FINA POINTS</span>
+                <span class="logo-bottom">BY BOROZDOV</span>
             </a>
 
             <div class="qr-wrap">
@@ -431,25 +467,23 @@
     <!-- QR Library -->
     <script src="/js/lib/qrcode.min.js"></script>
     <script>
-
-        // --- Theme logic ---
         const themeBtn = document.getElementById('theme-btn');
-        let currentTheme = localStorage.getItem('fina_theme') ||
-            (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        let qrInstance = null;
 
         function updateTheme(t) {
             document.documentElement.setAttribute('data-theme', t);
-            themeBtn.textContent = t === 'dark' ? '🌙' : '☀️';
-            renderQR();
+            if (themeBtn) themeBtn.textContent = t === 'dark' ? '🌙' : '☀️';
+            setTimeout(renderQR, 50);
         }
 
-        let qrInstance = null;
-
         function renderQR() {
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            const color = isDark ? '#c8a2ff' : '#8b5cf6';
-            const bg = isDark ? '#22222e' : '#eeeef2';
             const container = document.getElementById('qr-container');
+            if (!container) return;
+            
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            // Always monochrome colors for QR
+            const color = isDark ? '#ffffff' : '#1a1a2e';
+            const bg = isDark ? '#22222e' : '#eeeef2';
 
             container.innerHTML = '';
             qrInstance = new QRCode(container, {
@@ -462,16 +496,29 @@
             });
         }
 
-        themeBtn.addEventListener('click', () => {
-            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            localStorage.setItem('fina_theme', currentTheme);
-            updateTheme(currentTheme);
+        // Listen for theme changes from other tabs
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'fina_theme') {
+                updateTheme(localStorage.getItem('fina_theme') || 'dark');
+            }
         });
 
-        // Initialize
-        updateTheme(currentTheme);
+        if (themeBtn) {
+            themeBtn.addEventListener('click', () => {
+                const cur = document.documentElement.getAttribute('data-theme');
+                const next = cur === 'dark' ? 'light' : 'dark';
+                localStorage.setItem('fina_theme', next);
+                updateTheme(next);
+            });
+        }
 
-        // --- Share button ---
+        // Initial sync
+        const savedTheme = localStorage.getItem('fina_theme') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        updateTheme(savedTheme);
+
+        window.addEventListener('load', renderQR);
+
+        // Share functionality
         document.getElementById('share-qr-btn').addEventListener('click', async () => {
             const shareData = {
                 title: 'Калькулятор очков FINA',
@@ -487,9 +534,7 @@
                 }
             } catch (e) {
                 if (e.name !== 'AbortError') {
-                    try {
-                        await navigator.clipboard.writeText('https://fina.borozdov.ru/');
-                    } catch (_) { }
+                    try { await navigator.clipboard.writeText('https://fina.borozdov.ru/'); } catch (_) { }
                     showToast();
                 }
             }
@@ -497,8 +542,10 @@
 
         function showToast() {
             const t = document.getElementById('toast');
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2000);
+            if (t) {
+                t.classList.add('show');
+                setTimeout(() => t.classList.remove('show'), 2000);
+            }
         }
     </script>
 </body>

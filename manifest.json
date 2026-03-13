@@ -4,7 +4,7 @@
     "start_url": "/",
     "display": "standalone",
     "background_color": "#101014",
-    "theme_color": "#c8a2ff",
+    "theme_color": "#101014",
     "description": "Калькулятор очков FINA с поддержкой нормативов по плаванию",
     "lang": "ru",
     "dir": "ltr",

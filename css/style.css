@@ -18,8 +18,15 @@
     --ok-bg: var(--ac-d);
 }
 
-[data-theme="dark"][data-accent="purple"],
+[data-theme="dark"][data-accent="mono"],
 [data-theme="dark"] {
+    --ac: #ffffff;
+    --ac-d: rgba(255, 255, 255, 0.14);
+    --ac-g: rgba(255, 255, 255, 0.2);
+    --dot: #ffffff;
+}
+
+[data-theme="dark"][data-accent="purple"] {
     --ac: #c8a2ff;
     --ac-d: rgba(200, 162, 255, 0.14);
     --ac-g: rgba(200, 162, 255, 0.2);
@@ -75,13 +82,6 @@
     --dot: #a1a1aa;
 }
 
-[data-theme="dark"][data-accent="mono"] {
-    --ac: #ffffff;
-    --ac-d: rgba(255, 255, 255, 0.14);
-    --ac-g: rgba(255, 255, 255, 0.2);
-    --dot: #ffffff;
-}
-
 /* ===== Light theme colors ===== */
 [data-theme="light"] {
     --bg: #f4f4f8;
@@ -97,8 +97,15 @@
 }
 
 /* Darker accents for better readability on white */
-[data-theme="light"][data-accent="purple"],
+[data-theme="light"][data-accent="mono"],
 [data-theme="light"] {
+    --ac: #1a1a2e;
+    --ac-d: rgba(26, 26, 46, 0.12);
+    --ac-g: rgba(26, 26, 46, 0.2);
+    --dot: #1a1a2e;
+}
+
+[data-theme="light"][data-accent="purple"] {
     --ac: #8b5cf6;
     --ac-d: rgba(139, 92, 246, 0.12);
     --ac-g: rgba(139, 92, 246, 0.2);
@@ -154,13 +161,6 @@
     --dot: #a1a1aa;
 }
 
-[data-theme="light"][data-accent="mono"] {
-    --ac: #1a1a2e;
-    --ac-d: rgba(26, 26, 46, 0.12);
-    --ac-g: rgba(26, 26, 46, 0.2);
-    --dot: #1a1a2e;
-}
-
 /* ===== Reset ===== */
 *,
 *::before,
@@ -207,11 +207,37 @@ body {
 }
 
 .logo {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    line-height: 1;
+}
+
+.logo-top {
     font-size: 1.1rem;
     font-weight: 800;
     color: var(--ac);
-    letter-spacing: -0.03em;
+    letter-spacing: -0.02em;
     transition: color 0.3s;
+}
+
+.logo-bottom {
+    font-size: 0.52rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--dim);
+    margin-top: 2.5px;
+    opacity: 0.8;
+}
+
+.logo:hover .logo-top {
+    filter: brightness(1.1);
+}
+
+.logo:hover .logo-bottom {
+    color: var(--txt);
+    opacity: 1;
 }
 
 .header-actions {
