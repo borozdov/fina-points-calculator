@@ -126,7 +126,7 @@ class App {
                     if (f.value.length === 2 && i < a.length - 1 && a[i + 1]) { a[i + 1].focus(); a[i + 1].select(); }
                     this.autoCalcPoints();
                 };
-                f.onkeydown = e => { if (e.key === 'Enter') f.blur(); };
+                f.onkeyup = e => { if (e.key === 'Enter' || e.keyCode === 13) f.blur(); };
             });
 
             if (this.tQ) {
@@ -136,14 +136,14 @@ class App {
                     if (this.tH) this.tH.value = ''; 
                     this.autoCalcPoints(); 
                 };
-                this.tQ.onkeydown = e => { if (e.key === 'Enter') this.tQ.blur(); };
+                this.tQ.onkeyup = e => { if (e.key === 'Enter' || e.keyCode === 13) this.tQ.blur(); };
             }
             if (this.pIn) {
                 this.pIn.oninput = () => { 
                     if (this.pIn.value.length > 4) this.pIn.value = this.pIn.value.slice(0, 4); 
                     this.autoCalcTime(); 
                 };
-                this.pIn.onkeydown = e => { if (e.key === 'Enter') this.pIn.blur(); };
+                this.pIn.onkeyup = e => { if (e.key === 'Enter' || e.keyCode === 13) this.pIn.blur(); };
             }
         }
 

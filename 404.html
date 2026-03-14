@@ -1,79 +1,129 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Страница не найдена — FINA Points</title>
     <meta name="robots" content="noindex">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
 
-        body {
-            min-height: 100vh;
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Theme init -->
+    <script>
+        (function () {
+            try {
+                var theme = localStorage.getItem('fina_theme');
+                if (!theme) {
+                    theme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+                }
+                document.documentElement.setAttribute('data-theme', theme);
+                var accent = localStorage.getItem('fina_accent');
+                if (accent) {
+                    document.documentElement.setAttribute('data-accent', accent);
+                }
+            } catch (e) { }
+        })();
+    </script>
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <style>
+        .error-page {
+            flex: 1;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: #101014;
-            color: #e8e8ed;
             text-align: center;
-            padding: 20px;
+            padding: 40px 20px;
         }
 
-        .container {
-            max-width: 400px;
+        .error-code {
+            font-size: 6rem;
+            font-weight: 800;
+            line-height: 1;
+            background: linear-gradient(135deg, var(--ac), #c8a2ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 12px var(--ac-g));
         }
 
-        .emoji {
-            font-size: 4rem;
-            margin-bottom: 16px;
-        }
-
-        h1 {
+        .error-title {
             font-size: 1.5rem;
             font-weight: 800;
-            margin-bottom: 8px;
-            color: #c8a2ff;
+            color: var(--txt);
+            margin-bottom: 12px;
         }
 
-        p {
+        .error-desc {
             font-size: 0.9rem;
-            color: #7a7a8a;
-            margin-bottom: 24px;
+            color: var(--dim);
+            max-width: 320px;
+            margin-bottom: 30px;
             line-height: 1.5;
         }
 
-        a {
-            display: inline-block;
-            padding: 12px 32px;
-            background: #c8a2ff;
-            color: #101014;
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 32px;
+            background: var(--ac-d);
+            border: 1px solid var(--ac-g);
+            color: var(--ac);
             text-decoration: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-weight: 700;
-            font-size: 0.9rem;
-            transition: filter 0.2s;
+            font-size: 0.95rem;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        a:hover {
-            filter: brightness(1.1);
+        .back-btn:hover {
+            background: var(--ac);
+            color: var(--bg);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--ac-g);
+        }
+        
+        .back-btn:active {
+            transform: translateY(0);
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <div class="emoji">🏊</div>
-        <h1>404 — Страница не найдена</h1>
-        <p>Такой страницы нет, но калькулятор очков FINA всегда доступен на главной.</p>
-        <a href="/">Перейти к калькулятору</a>
-    </div>
+    <main class="app" style="min-height: 100dvh; display: flex; flex-direction: column;">
+        <!-- Header -->
+        <div class="header-row">
+            <div>
+                <a href="/" class="logo" aria-label="FINA Points by Borozdov">
+                    <span class="logo-top">FINA POINTS</span>
+                    <span class="logo-bottom">BY BOROZDOV</span>
+                </a>
+            </div>
+            <div class="header-actions">
+                <a href="/" class="icon-btn" aria-label="На главную" title="На главную">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                </a>
+            </div>
+        </div>
+
+        <div class="error-page">
+            <div class="error-code">404</div>
+            <div class="error-title">Страница не найдена</div>
+            <div class="error-desc">Такой страницы не существует, или она была перемещена. Но вы всегда можете вернуться к калькулятору!</div>
+            <a href="/" class="back-btn">На главную</a>
+        </div>
+    </main>
 </body>
 
 </html>
