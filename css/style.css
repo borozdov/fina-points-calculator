@@ -183,7 +183,7 @@ body {
     background: var(--bg);
     color: var(--txt);
     line-height: 1.4;
-    overflow-x: hidden;
+    overflow: hidden;
     transition: background 0.3s, color 0.3s;
 }
 
@@ -191,11 +191,12 @@ body {
 .app {
     max-width: 480px;
     margin: 0 auto;
-    padding: 10px 14px 14px;
-    min-height: 100dvh;
+    padding: 8px 12px 8px;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
+    overflow: hidden;
 }
 
 /* ===== Header ===== */
@@ -349,8 +350,8 @@ body {
 
 .seg-btn {
     flex: 1;
-    padding: 6px 2px;
-    font-size: 0.82rem;
+    padding: 8px 4px;
+    font-size: 0.9rem;
     font-weight: 600;
     font-family: var(--font);
     color: var(--dim);
@@ -399,8 +400,8 @@ body {
 }
 
 .chip {
-    padding: 5px 10px;
-    font-size: 0.75rem;
+    padding: 7px 12px;
+    font-size: 0.85rem;
     font-weight: 500;
     font-family: var(--font);
     color: var(--dim);
@@ -457,7 +458,8 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
+    justify-content: center;
 }
 
 .form.hidden {
