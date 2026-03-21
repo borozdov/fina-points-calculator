@@ -18,12 +18,7 @@
             "200m Butterfly": 106.85,
             "100m Medley": 49.28,
             "200m Medley": 108.88,
-            "400m Medley": 234.81,
-            "4x50m Freestyle Relay": 81.8,
-            "4x100m Freestyle Relay": 181.66,
-            "4x200m Freestyle Relay": 400.51,
-            "4x50m Medley Relay": 89.72,
-            "4x100m Medley Relay": 198.68
+            "400m Medley": 234.81
         },
         "Women": {
             "50m Freestyle": 22.83,
@@ -43,16 +38,7 @@
             "200m Butterfly": 119.32,
             "100m Medley": 55.11,
             "200m Medley": 121.63,
-            "400m Medley": 255.48,
-            "4x50m Freestyle Relay": 92.5,
-            "4x100m Freestyle Relay": 205.01,
-            "4x200m Freestyle Relay": 450.13,
-            "4x50m Medley Relay": 102.35,
-            "4x100m Medley Relay": 220.41
-        },
-        "Mixed": {
-            "4x50m Freestyle Relay": 87.26,
-            "4x50m Medley Relay": 95.15
+            "400m Medley": 255.48
         }
     },
     "LCM": {
@@ -73,10 +59,7 @@
             "100m Butterfly": 49.45,
             "200m Butterfly": 110.34,
             "200m Medley": 112.69,
-            "400m Medley": 242.5,
-            "4x100m Freestyle Relay": 188.24,
-            "4x200m Freestyle Relay": 418.55,
-            "4x100m Medley Relay": 206.78
+            "400m Medley": 242.5
         },
         "Women": {
             "50m Freestyle": 23.61,
@@ -95,14 +78,7 @@
             "100m Butterfly": 54.6,
             "200m Butterfly": 121.81,
             "200m Medley": 125.7,
-            "400m Medley": 263.65,
-            "4x100m Freestyle Relay": 207.96,
-            "4x200m Freestyle Relay": 457.5,
-            "4x100m Medley Relay": 229.34
-        },
-        "Mixed": {
-            "4x100m Freestyle Relay": 198.48,
-            "4x100m Medley Relay": 217.43
+            "400m Medley": 263.65
         }
     }
 }

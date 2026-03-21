@@ -1,7 +1,6 @@
 import { RU } from '../data/constants.js';
 
 export function parseEventInfo(k) {
-    if (k.includes('Relay')) return { style: 'Relays', dist: k, label: RU[k] || k };
     const m = k.match(/^(\d+)m (.*)$/);
     return { style: m ? m[2] : '', dist: m ? m[1] : '', label: m ? (m[1] + 'м') : k };
 }
