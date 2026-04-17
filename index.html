@@ -79,12 +79,7 @@
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta name="referrer" content="strict-origin-when-cross-origin">
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" as="style"
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Fonts: system stack, no external request -->
 
     <!-- Theme init (prevent flash) -->
     <script>
@@ -535,13 +530,11 @@
     <!-- /Yandex.Metrika counter -->
     <script>
         window.addEventListener('load', () => {
-            setTimeout(() => {
-                const splash = document.getElementById('splash-screen');
-                if (splash) {
-                    splash.classList.add('hidden');
-                    setTimeout(() => { splash.remove(); }, 600);
-                }
-            }, 1200);
+            const splash = document.getElementById('splash-screen');
+            if (splash) {
+                splash.classList.add('hidden');
+                setTimeout(() => { splash.remove(); }, 600);
+            }
         });
     </script>
 </body>
