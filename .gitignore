@@ -18,3 +18,10 @@ tmp/
 
 # Source images (not needed in production)
 1.png
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
