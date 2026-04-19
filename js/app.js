@@ -487,4 +487,18 @@ class App {
 
 document.addEventListener("DOMContentLoaded", () => {
     new App();
+
+    document.addEventListener("pointerdown", (e) => {
+        const active = document.activeElement;
+        if (!active) return;
+        const tag = active.tagName;
+        const isField =
+            (tag === "INPUT" && !["button", "submit", "checkbox", "radio", "file", "reset"].includes(active.type)) ||
+            tag === "TEXTAREA" ||
+            tag === "SELECT";
+        if (!isField) return;
+        if (active.contains(e.target) || active === e.target) return;
+        if (e.target.closest("input, textarea, select, button, label, a")) return;
+        active.blur();
+    });
 });
