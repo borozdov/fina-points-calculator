@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fina-calc';
+const CACHE_NAME = 'fina-calc-v2';
 const ASSETS_TO_CACHE = [
     '/',
     '/index.html',
@@ -29,6 +29,7 @@ self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => cache.addAll(ASSETS_TO_CACHE))
+            .then(() => self.skipWaiting())
     );
 });
 

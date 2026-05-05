@@ -79,6 +79,21 @@
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta name="referrer" content="strict-origin-when-cross-origin">
 
+    <!-- Preload JS modules to avoid waterfall -->
+    <link rel="modulepreload" href="js/app.js">
+    <link rel="modulepreload" href="js/data/constants.js">
+    <link rel="modulepreload" href="js/data/world_records.js">
+    <link rel="modulepreload" href="js/data/standards.js">
+    <link rel="modulepreload" href="js/helpers/utils.js">
+    <link rel="modulepreload" href="js/core/Calculator.js">
+    <link rel="modulepreload" href="js/core/Storage.js">
+    <link rel="modulepreload" href="js/ui/Share.js">
+    <link rel="modulepreload" href="js/ui/PWAInstall.js">
+    <link rel="modulepreload" href="js/ui/Onboarding.js">
+
+    <!-- Preconnect for analytics -->
+    <link rel="preconnect" href="https://mc.yandex.ru">
+
     <!-- Fonts: system stack, no external request -->
 
     <!-- Theme init (prevent flash) -->
@@ -529,7 +544,7 @@
     </noscript>
     <!-- /Yandex.Metrika counter -->
     <script>
-        window.addEventListener('load', () => {
+        document.addEventListener('DOMContentLoaded', () => {
             const splash = document.getElementById('splash-screen');
             if (splash) {
                 splash.classList.add('hidden');
