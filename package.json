@@ -1,0 +1,29 @@
+{
+    "name": "fina-points-calculator",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "description": "FINA Points Calculator Android wrapper",
+    "scripts": {
+        "build:web": "node scripts/build-www.mjs",
+        "cap:sync": "npm run build:web && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home ANDROID_HOME=/opt/homebrew/share/android-commandlinetools ANDROID_SDK_ROOT=/opt/homebrew/share/android-commandlinetools npx cap sync android",
+        "android:debug": "npm run cap:sync && cd android && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home ANDROID_HOME=/opt/homebrew/share/android-commandlinetools ANDROID_SDK_ROOT=/opt/homebrew/share/android-commandlinetools ./gradlew assembleDebug",
+        "apk:debug": "npm run android:debug && cp android/app/build/outputs/apk/debug/app-debug.apk fina-points-debug.apk",
+        "android:release": "npm run cap:sync && cd android && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home ANDROID_HOME=/opt/homebrew/share/android-commandlinetools ANDROID_SDK_ROOT=/opt/homebrew/share/android-commandlinetools ./gradlew assembleRelease",
+        "apk:release": "npm run android:release && cp android/app/build/outputs/apk/release/app-release.apk fina-points-rustore-release.apk",
+        "android:aab": "npm run cap:sync && cd android && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home ANDROID_HOME=/opt/homebrew/share/android-commandlinetools ANDROID_SDK_ROOT=/opt/homebrew/share/android-commandlinetools ./gradlew bundleRelease",
+        "aab:release": "npm run android:aab && cp android/app/build/outputs/bundle/release/app-release.aab fina-points-rustore-release.aab"
+    },
+    "dependencies": {
+        "@capacitor/android": "8.3.4",
+        "@capacitor/browser": "^8.0.2",
+        "@capacitor/core": "8.3.4",
+        "@capacitor/filesystem": "^8.1.2",
+        "@capacitor/share": "^8.0.1",
+        "@capacitor/status-bar": "^8.0.2"
+    },
+    "devDependencies": {
+        "@capacitor/assets": "3.0.5",
+        "@capacitor/cli": "8.3.4"
+    }
+}

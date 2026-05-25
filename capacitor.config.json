@@ -1,0 +1,15 @@
+{
+    "appId": "ru.borozdov.finapoints",
+    "appName": "FINA Points",
+    "webDir": "www",
+    "server": {
+        "androidScheme": "https"
+    },
+    "plugins": {
+        "StatusBar": {
+            "overlaysWebView": true,
+            "style": "DARK",
+            "backgroundColor": "#101014"
+        }
+    }
+}

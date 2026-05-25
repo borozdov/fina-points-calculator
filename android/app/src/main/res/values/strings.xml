@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">FINA Points</string>
+    <string name="title_activity_main">FINA Points</string>
+    <string name="widget_name">FINA Points</string>
+    <string name="widget_description">Быстрый перевод секунд в очки FINA и очков FINA во время</string>
+    <string name="shortcut_widget_short">Виджет</string>
+    <string name="shortcut_widget_long">Добавить виджет</string>
+    <string name="widget_pin_unsupported">Откройте меню виджетов телефона и выберите FINA Points.</string>
+    <string name="package_name">ru.borozdov.finapoints</string>
+    <string name="custom_url_scheme">ru.borozdov.finapoints</string>
+</resources>

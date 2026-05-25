@@ -17,6 +17,11 @@ export class PWAInstall {
     }
 
     init() {
+        if (this.isNativeApp()) {
+            this.hideInstallUi();
+            return;
+        }
+
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
         if (!isStandalone) {
@@ -132,6 +137,30 @@ export class PWAInstall {
 
     hideModal() {
         this.installModal.classList.remove('active');
+    }
+
+    hideInstallUi() {
+        if (this.installBtn) this.installBtn.style.display = 'none';
+        if (this.banner) {
+            this.banner.classList.remove('show', 'hiding', 'banner-shifted');
+            this.banner.hidden = true;
+        }
+        if (this.installModal) {
+            this.installModal.classList.remove('active');
+            this.installModal.hidden = true;
+        }
+    }
+
+    isNativeApp() {
+        const Capacitor = window.Capacitor;
+        if (!Capacitor) return false;
+        if (typeof Capacitor.isNativePlatform === 'function') {
+            return Capacitor.isNativePlatform();
+        }
+        if (typeof Capacitor.getPlatform === 'function') {
+            return Capacitor.getPlatform() !== 'web';
+        }
+        return Boolean(Capacitor.Plugins);
     }
 
     isIOS() {

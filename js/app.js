@@ -6,6 +6,7 @@ import { StorageManager } from './core/Storage.js';
 import { ShareManager } from './ui/Share.js';
 import { PWAInstall } from './ui/PWAInstall.js';
 import { Onboarding } from './ui/Onboarding.js';
+import { syncNativeChrome } from './ui/NativeChrome.js';
 
 class App {
     constructor() {
@@ -21,6 +22,7 @@ class App {
         this.initDOM();
         this.bindEvents();
         this.initTheme();
+        this.initKeyboardMode();
         this.renderFavs();
         this.fillEvents();
 
@@ -64,6 +66,7 @@ class App {
         this.sharePtsBtn = get('share-pts');
         this.shareTimeBtn = get('share-time');
         this.toastEl = get('toast');
+        this.donateBtn = get('donate-btn');
 
         this.themeToggle = get('theme-toggle');
         this.themeIcon = get('theme-icon');
@@ -130,7 +133,9 @@ class App {
             });
 
             if (this.tQ) {
+                this.bindInputFilter(this.tQ, /[0-9:.,]/, value => value.replace(/[^0-9:.,]/g, ''));
                 this.tQ.oninput = () => { 
+                    this.tQ.value = this.sanitizeTimeInput(this.tQ.value);
                     if (this.tM) this.tM.value = ''; 
                     if (this.tS) this.tS.value = ''; 
                     if (this.tH) this.tH.value = ''; 
@@ -139,8 +144,9 @@ class App {
                 this.tQ.onkeyup = e => { if (e.key === 'Enter' || e.keyCode === 13) this.tQ.blur(); };
             }
             if (this.pIn) {
+                this.bindInputFilter(this.pIn, /[0-9]/, value => value.replace(/\D/g, '').slice(0, 4));
                 this.pIn.oninput = () => { 
-                    if (this.pIn.value.length > 4) this.pIn.value = this.pIn.value.slice(0, 4); 
+                    this.pIn.value = this.sanitizePointsInput(this.pIn.value);
                     this.autoCalcTime(); 
                 };
                 this.pIn.onkeyup = e => { if (e.key === 'Enter' || e.keyCode === 13) this.pIn.blur(); };
@@ -177,6 +183,45 @@ class App {
 
         if (this.sharePtsBtn) this.sharePtsBtn.onclick = () => this.shareResult('pts');
         if (this.shareTimeBtn) this.shareTimeBtn.onclick = () => this.shareResult('time');
+
+        if (this.donateBtn) {
+            this.donateBtn.onclick = async (e) => {
+                const url = this.donateBtn.href;
+                const Browser = window.Capacitor?.Plugins?.Browser;
+                if (!Browser?.open) return;
+
+                e.preventDefault();
+                try {
+                    await Browser.open({ url });
+                } catch (err) {
+                    window.open(url, '_blank', 'noopener,noreferrer');
+                }
+            };
+        }
+    }
+
+    bindInputFilter(input, allowedChar, sanitize) {
+        input.addEventListener('beforeinput', (event) => {
+            if (!event.data || event.inputType.startsWith('delete')) return;
+            if (![...event.data].every(char => allowedChar.test(char))) {
+                event.preventDefault();
+            }
+        });
+
+        input.addEventListener('paste', () => {
+            requestAnimationFrame(() => {
+                input.value = sanitize(input.value);
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+            });
+        });
+    }
+
+    sanitizeTimeInput(value) {
+        return value.replace(/[^0-9:.,]/g, '');
+    }
+
+    sanitizePointsInput(value) {
+        return value.replace(/\D/g, '').slice(0, 4);
     }
 
     setupSeg(sel, attr, cb) {
@@ -202,6 +247,7 @@ class App {
         document.documentElement.setAttribute('data-theme', t);
         this.themeIcon.textContent = t === 'dark' ? '🌙' : '☀️';
         StorageManager.saveTheme(t);
+        syncNativeChrome(t);
     }
 
     setAccent(c) {
@@ -209,6 +255,41 @@ class App {
         StorageManager.saveAccent(c);
         this.colorPicker.querySelectorAll('.color-dot').forEach(d => {
             d.classList.toggle('active', d.dataset.color === c);
+        });
+    }
+
+    initKeyboardMode() {
+        const root = document.documentElement;
+        const keyboardFields = 'input[type="text"], input[type="number"], textarea';
+        const setViewportHeight = () => {
+            const height = window.visualViewport?.height || window.innerHeight;
+            root.style.setProperty('--keyboard-app-height', `${Math.max(360, Math.floor(height))}px`);
+        };
+        const setOpen = (open) => {
+            setViewportHeight();
+            root.classList.toggle('keyboard-open', open);
+            if (open) {
+                setTimeout(() => {
+                    const active = document.activeElement;
+                    if (active?.matches?.(keyboardFields)) {
+                        active.scrollIntoView({ block: 'center', inline: 'nearest' });
+                    }
+                }, 120);
+            }
+        };
+
+        window.visualViewport?.addEventListener('resize', () => {
+            if (root.classList.contains('keyboard-open')) setViewportHeight();
+        });
+
+        document.addEventListener('focusin', (event) => {
+            if (event.target?.matches?.(keyboardFields)) setOpen(true);
+        });
+
+        document.addEventListener('focusout', () => {
+            setTimeout(() => {
+                if (!document.activeElement?.matches?.(keyboardFields)) setOpen(false);
+            }, 80);
         });
     }
 

@@ -18,3 +18,24 @@ tmp/
 
 # Source images (not needed in production)
 1.png
+
+# Node/Capacitor
+node_modules/
+www/
+
+# Android
+android/.gradle/
+android/.idea/
+android/build/
+android/app/build/
+android/local.properties
+android/signing/*.jks
+android/signing/*.keystore
+android/signing/*.properties
+!android/signing/*.example.properties
+
+# Build artifacts
+*.apk
+*.aab
+rustore/fina-points-rustore-pack.zip
+rustore/aab-signature/pepk_out.zip

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#101014</color>
+    <color name="colorPrimaryDark">#101014</color>
+    <color name="colorAccent">#c8a2ff</color>
+    <color name="status_bar_dark">#101014</color>
+    <color name="navigation_bar_dark">#101014</color>
+    <color name="widget_background">#101014</color>
+    <color name="widget_surface">#1a1a22</color>
+    <color name="widget_surface_2">#22222e</color>
+    <color name="widget_text">#e8e8ed</color>
+    <color name="widget_dim">#a1a1aa</color>
+    <color name="widget_accent">#c8a2ff</color>
+</resources>

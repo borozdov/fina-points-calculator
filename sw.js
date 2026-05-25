@@ -1,10 +1,9 @@
-const CACHE_NAME = 'fina-calc-v2';
+const CACHE_NAME = 'fina-calc-v8';
 const ASSETS_TO_CACHE = [
     '/',
     '/index.html',
     '/css/style.css',
     '/js/app.js',
-    '/js/lib/qrcode.min.js',
     '/js/data/constants.js',
     '/js/data/standards.js',
     '/js/data/world_records.js',
@@ -14,15 +13,14 @@ const ASSETS_TO_CACHE = [
     '/js/ui/Share.js',
     '/js/ui/PWAInstall.js',
     '/js/ui/Onboarding.js',
+    '/js/ui/NativeChrome.js',
     '/data/swimming_standards.json',
     '/manifest.json',
     '/robots.txt',
     '/assets/img/favicon.png',
     '/assets/img/icon-192.png',
     '/assets/img/icon-512.png',
-    '/assets/img/apple-touch-icon.png',
-    '/qr/',
-    '/qr/index.html'
+    '/assets/img/apple-touch-icon.png'
 ];
 
 self.addEventListener('install', (event) => {

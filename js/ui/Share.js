@@ -1,4 +1,24 @@
 export class ShareManager {
+    static isNative() {
+        const cap = window.Capacitor;
+        return !!(cap && (
+            (typeof cap.isNativePlatform === 'function' && cap.isNativePlatform()) ||
+            (typeof cap.getPlatform === 'function' && cap.getPlatform() !== 'web')
+        ));
+    }
+
+    static blobToBase64(blob) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const dataUrl = String(reader.result || '');
+                resolve(dataUrl.includes(',') ? dataUrl.split(',')[1] : dataUrl);
+            };
+            reader.onerror = () => reject(reader.error || new Error('FileReader failed'));
+            reader.readAsDataURL(blob);
+        });
+    }
+
     static async drawShareImage(timeStr, ptsStr, eventStr, rank, themeConfig) {
         const canvas = document.createElement('canvas');
         canvas.width = 1080;
@@ -78,7 +98,45 @@ export class ShareManager {
             ctx.fillRect((canvas.width / 2) - 80, 1000, 160, 6);
         }
 
-        return new Promise(resolve => canvas.toBlob(resolve, 'image/png', 1.0));
+        return new Promise((resolve, reject) => {
+            canvas.toBlob(blob => {
+                if (blob) resolve(blob);
+                else reject(new Error('Не удалось создать изображение'));
+            }, 'image/png', 1.0);
+        });
+    }
+
+    static async nativeShare(blob, text) {
+        const plugins = window.Capacitor?.Plugins || {};
+        const Share = plugins.Share;
+        const Filesystem = plugins.Filesystem;
+
+        if (!Share?.share) throw new Error('Native Share plugin is not available');
+        if (!Filesystem?.writeFile) {
+            await Share.share({
+                title: 'Мой результат в FINA Points',
+                text,
+                dialogTitle: 'Поделиться результатом'
+            });
+            return;
+        }
+
+        const path = `share/fina-result-${Date.now()}.png`;
+        const data = await this.blobToBase64(blob);
+        const written = await Filesystem.writeFile({
+            path,
+            data,
+            directory: 'CACHE',
+            recursive: true
+        });
+        const uri = written?.uri || (await Filesystem.getUri({ path, directory: 'CACHE' })).uri;
+
+        await Share.share({
+            title: 'Мой результат в FINA Points',
+            text,
+            files: [uri],
+            dialogTitle: 'Поделиться результатом'
+        });
     }
 
     static async shareResult(data, onToast) {
@@ -87,12 +145,23 @@ export class ShareManager {
         try {
             const blob = await this.drawShareImage(timeStr, ptsStr, eventStr, rank, themeConfig);
             const file = new File([blob], 'fina_result.png', { type: 'image/png' });
+            const text = `Смотри мой результат: ${eventStr}. Рассчитано в FINA Points by Borozdov.\n\nhttps://fina.borozdov.ru`;
+
+            if (this.isNative()) {
+                await this.nativeShare(blob, text);
+                return;
+            }
 
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 await navigator.share({
                     files: [file],
                     title: 'Мой результат в FINA Points',
-                    text: `Смотри мой результат: ${eventStr}! Рассчитано в калькуляторе FINA Points Borozdov 🏊\n\nУзнай свои очки: https://fina.borozdov.ru`
+                    text
+                });
+            } else if (navigator.share) {
+                await navigator.share({
+                    title: 'Мой результат в FINA Points',
+                    text
                 });
             } else {
                 const url = URL.createObjectURL(blob);
@@ -103,10 +172,11 @@ export class ShareManager {
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                onToast('Картинка сохранена!');
+                onToast('Картинка скачана');
             }
         } catch (err) {
-            if (err.name !== 'AbortError') {
+            const message = String(err?.message || '');
+            if (err.name !== 'AbortError' && !message.toLowerCase().includes('cancel')) {
                 console.error('Ошибка генерации шеринга', err);
                 onToast('Ошибка при отправке');
             }
