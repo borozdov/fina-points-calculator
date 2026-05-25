@@ -208,128 +208,128 @@ body {
 }
 
 @media (min-width: 820px) and (min-height: 700px) {
-    .app {
+    body.native-app .app {
         max-width: 760px;
         padding: 16px 22px;
         gap: 10px;
     }
 
-    .native-statusbar-overlay .app {
+    body.native-app.native-statusbar-overlay .app {
         padding-top: calc(16px + max(var(--native-statusbar-height, 0px), env(safe-area-inset-top)));
         padding-bottom: calc(16px + env(safe-area-inset-bottom));
     }
 
-    .logo-top {
+    body.native-app .logo-top {
         font-size: 1.35rem;
     }
 
-    .logo-bottom {
+    body.native-app .logo-bottom {
         font-size: 0.62rem;
     }
 
-    .header-actions {
+    body.native-app .header-actions {
         gap: 8px;
     }
 
-    .icon-btn {
+    body.native-app .icon-btn {
         width: 42px;
         height: 42px;
         font-size: 1.12rem;
     }
 
-    .label {
+    body.native-app .label {
         font-size: 0.7rem;
         margin-bottom: 6px;
     }
 
-    .row,
-    .events-row {
+    body.native-app .row,
+    body.native-app .events-row {
         gap: 18px;
     }
 
-    .seg {
+    body.native-app .seg {
         border-radius: 12px;
         padding: 3px;
     }
 
-    .seg-btn {
+    body.native-app .seg-btn {
         padding: 11px 8px;
         border-radius: 9px;
         font-size: 1rem;
     }
 
-    .events {
+    body.native-app .events {
         gap: 7px;
     }
 
-    .chip {
+    body.native-app .chip {
         padding: 10px 16px;
         font-size: 0.95rem;
     }
 
-    .calc {
+    body.native-app .calc {
         border-radius: 20px;
         padding: 18px;
     }
 
-    .mode-seg {
+    body.native-app .mode-seg {
         margin-bottom: 14px;
     }
 
-    .form {
+    body.native-app .form {
         gap: 10px;
     }
 
-    .time-row {
+    body.native-app .time-row {
         gap: 8px;
     }
 
-    .tf label {
+    body.native-app .tf label {
         font-size: 0.66rem;
     }
 
-    .tf input {
+    body.native-app .tf input {
         width: 76px;
         padding: 11px 4px;
         border-radius: 10px;
         font-size: 1.55rem;
     }
 
-    .sep {
+    body.native-app .sep {
         font-size: 1.45rem;
         padding-bottom: 8px;
     }
 
-    .quick {
+    body.native-app .quick {
         padding: 12px 14px;
         border-radius: 11px;
         font-size: 1rem;
     }
 
-    .pts-input {
+    body.native-app .pts-input {
         padding: 18px 14px;
         border-radius: 11px;
         font-size: 2rem;
     }
 
-    .result {
+    body.native-app .result {
         border-radius: 18px;
         padding: 18px;
     }
 
-    .result-label {
+    body.native-app .result-label {
         font-size: 0.72rem;
     }
 
-    .result-val {
+    body.native-app .result-val {
         font-size: 2.8rem;
     }
 
-    .result-wr {
+    body.native-app .result-wr {
         font-size: 0.78rem;
     }
 
-    .rank-badge {
+    body.native-app .rank-badge {
         top: 12px;
         left: 12px;
         font-size: 0.85rem;
@@ -337,11 +337,11 @@ body {
         padding: 3px 8px;
     }
 
-    .history-list {
+    body.native-app .history-list {
         max-height: 180px;
     }
 
-    .history-item {
+    body.native-app .history-item {
         padding: 8px 12px;
         border-radius: 10px;
         font-size: 0.88rem;
