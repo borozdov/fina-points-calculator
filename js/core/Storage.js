@@ -12,10 +12,10 @@ export class StorageManager {
     }
 
     static getTheme() {
-        return localStorage.getItem('fina_theme');
+        return localStorage.getItem('fina_lik');
     }
 
     static saveTheme(t) {
-        localStorage.setItem('fina_theme', t);
+        localStorage.setItem('fina_lik', t);
     }
 }

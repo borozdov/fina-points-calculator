@@ -25,7 +25,7 @@
     <script>
         (function () {
             try {
-                var theme = localStorage.getItem('fina_theme');
+                var theme = localStorage.getItem('fina_lik');
                 if (!theme) {
                     theme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
                 }
@@ -558,8 +558,8 @@
 
         // Listen for theme changes from other tabs
         window.addEventListener('storage', (e) => {
-            if (e.key === 'fina_theme') {
-                updateTheme(localStorage.getItem('fina_theme') || 'dark');
+            if (e.key === 'fina_lik') {
+                updateTheme(localStorage.getItem('fina_lik') || 'dark');
             }
         });
 
@@ -567,14 +567,20 @@
             themeBtn.addEventListener('click', () => {
                 const cur = document.documentElement.getAttribute('data-theme');
                 const next = cur === 'dark' ? 'light' : 'dark';
-                localStorage.setItem('fina_theme', next);
+                localStorage.setItem('fina_lik', next);
                 updateTheme(next);
             });
         }
 
-        // Initial sync
-        const savedTheme = localStorage.getItem('fina_theme') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-        updateTheme(savedTheme);
+        // Initial sync: сохранённый ручной выбор сильнее среды
+        const media = window.matchMedia('(prefers-color-scheme: light)');
+        updateTheme(localStorage.getItem('fina_lik') || (media.matches ? 'light' : 'dark'));
+
+        // Следуем за системной темой, пока лик не выбран вручную
+        media.addEventListener('change', (e) => {
+            if (localStorage.getItem('fina_lik')) return;
+            updateTheme(e.matches ? 'light' : 'dark');
+        });
 
         window.addEventListener('load', renderQR);
 

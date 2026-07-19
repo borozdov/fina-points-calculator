@@ -76,7 +76,7 @@ class App {
         if (this.themeToggle) {
             this.themeToggle.onclick = () => {
                 const cur = document.documentElement.getAttribute('data-theme');
-                this.setTheme(cur === 'dark' ? 'light' : 'dark');
+                this.setTheme(cur === 'dark' ? 'light' : 'dark', true);
             };
         }
 
@@ -207,16 +207,22 @@ class App {
     }
 
     initTheme() {
-        const savedTheme = StorageManager.getTheme();
-        if (savedTheme) {
-            this.setTheme(savedTheme);
-        } else {
-            const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-            this.setTheme(prefersLight ? 'light' : 'dark');
-        }
+        // Ключ сменён с fina_theme на fina_lik: старый писался и при автовыборе,
+        // из-за чего тема замораживалась и переставала следовать за системной.
+        // Теперь сохраняется только ручной выбор — по умолчанию лик следует за средой.
+        try { localStorage.removeItem('fina_theme'); } catch (e) { }
+
+        const media = window.matchMedia ? window.matchMedia('(prefers-color-scheme: light)') : null;
+        const saved = StorageManager.getTheme();
+        this.setTheme(saved || ((media && media.matches) ? 'light' : 'dark'));
+
+        media?.addEventListener('change', (e) => {
+            if (StorageManager.getTheme()) return; // ручной выбор сильнее среды
+            this.setTheme(e.matches ? 'light' : 'dark');
+        });
     }
 
-    setTheme(t) {
+    setTheme(t, persist = false) {
         // Смена лика мгновенна — без transition-каскада на цветах
         const root = document.documentElement;
         root.classList.add('theme-switching');
@@ -224,7 +230,7 @@ class App {
         void root.offsetHeight; // фиксируем новые цвета при выключенных transition
         root.classList.remove('theme-switching');
         if (this.metaThemeColor) this.metaThemeColor.content = t === 'light' ? '#fafafa' : '#0d0d0d';
-        StorageManager.saveTheme(t);
+        if (persist) StorageManager.saveTheme(t);
         syncNativeChrome(t);
     }
 
