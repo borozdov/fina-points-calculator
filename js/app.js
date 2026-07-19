@@ -74,9 +74,10 @@ class App {
 
     bindEvents() {
         if (this.themeToggle) {
+            // Трёхтактный цикл: тёмный → светлый → авто (по системе) → тёмный
             this.themeToggle.onclick = () => {
-                const cur = document.documentElement.getAttribute('data-theme');
-                this.setTheme(cur === 'dark' ? 'light' : 'dark', true);
+                this.themeMode = { dark: 'light', light: 'auto', auto: 'dark' }[this.themeMode] || 'dark';
+                this.applyThemeMode(true);
             };
         }
 
@@ -209,20 +210,45 @@ class App {
     initTheme() {
         // Ключ сменён с fina_theme на fina_lik: старый писался и при автовыборе,
         // из-за чего тема замораживалась и переставала следовать за системной.
-        // Теперь сохраняется только ручной выбор — по умолчанию лик следует за средой.
+        // Сохраняется только ручной выбор; режим 'auto' следует за средой.
         try { localStorage.removeItem('fina_theme'); } catch (e) { }
 
-        const media = window.matchMedia ? window.matchMedia('(prefers-color-scheme: light)') : null;
+        this.themeMedia = window.matchMedia ? window.matchMedia('(prefers-color-scheme: light)') : null;
         const saved = StorageManager.getTheme();
-        this.setTheme(saved || ((media && media.matches) ? 'light' : 'dark'));
+        this.themeMode = (saved === 'dark' || saved === 'light') ? saved : 'auto';
+        this.applyThemeMode(false);
 
-        media?.addEventListener('change', (e) => {
-            if (StorageManager.getTheme()) return; // ручной выбор сильнее среды
-            this.setTheme(e.matches ? 'light' : 'dark');
+        this.themeMedia?.addEventListener('change', () => {
+            if (this.themeMode === 'auto') this.applyThemeMode(false);
         });
     }
 
-    setTheme(t, persist = false) {
+    applyThemeMode(persist) {
+        const mode = this.themeMode;
+        const effective = mode === 'auto'
+            ? ((this.themeMedia && this.themeMedia.matches) ? 'light' : 'dark')
+            : mode;
+
+        document.documentElement.setAttribute('data-theme-mode', mode);
+        this.setTheme(effective);
+
+        if (persist) {
+            if (mode === 'auto') StorageManager.clearTheme();
+            else StorageManager.saveTheme(mode);
+        }
+
+        if (this.themeToggle) {
+            const next = {
+                dark: 'Светлый лик',
+                light: 'Авто — следовать за системой',
+                auto: 'Тёмный лик'
+            }[mode];
+            this.themeToggle.title = next;
+            this.themeToggle.setAttribute('aria-label', `Переключить тему: ${next}`);
+        }
+    }
+
+    setTheme(t) {
         // Смена лика мгновенна — без transition-каскада на цветах
         const root = document.documentElement;
         root.classList.add('theme-switching');
@@ -230,7 +256,6 @@ class App {
         void root.offsetHeight; // фиксируем новые цвета при выключенных transition
         root.classList.remove('theme-switching');
         if (this.metaThemeColor) this.metaThemeColor.content = t === 'light' ? '#fafafa' : '#0d0d0d';
-        if (persist) StorageManager.saveTheme(t);
         syncNativeChrome(t);
     }
 
