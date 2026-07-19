@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fina-calc-v11';
+const CACHE_NAME = 'fina-calc-v12';
 const ASSETS_TO_CACHE = [
     '/',
     '/index.html',
