@@ -25,77 +25,119 @@ export class ShareManager {
         canvas.height = 1080;
         const ctx = canvas.getContext('2d');
 
-        const { pool, isLight, acHex } = themeConfig;
-        const bgHex = isLight ? '#ffffff' : '#101014';
-        const textMainHex = isLight ? '#18181b' : '#ffffff';
-        const textMutedHex = isLight ? '#71717a' : '#a1a1aa';
+        const { pool, isLight, primary } = themeConfig;
 
-        // Background 
-        ctx.fillStyle = bgHex;
+        // Роли лика (§2.1 брендбука)
+        const C = isLight
+            ? { canvas: '#fafafa', inset: '#ececec', surface: '#ffffff', border: '#e4e4e4', slate: '#6b6b6b', soft: '#3d3d3d', text: '#0d0d0d' }
+            : { canvas: '#0d0d0d', inset: '#121212', surface: '#1a1a1a', border: '#2e2e2e', slate: '#8a8a8a', soft: '#d1d1d1', text: '#fafafa' };
+
+        const uiFont = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        const monoFont = '"JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace';
+
+        try { await document.fonts.load(`700 150px ${monoFont}`); await document.fonts.load(`600 60px ${uiFont}`); } catch (e) { }
+
+        // Канва
+        ctx.fillStyle = C.canvas;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Accent Line
-        ctx.fillStyle = acHex;
-        ctx.fillRect(0, 0, canvas.width, 24);
+        // Карта — surface с hairline-границей
+        const cardX = 70, cardY = 70, cardW = 940, cardH = 940, r = 16;
+        ctx.fillStyle = C.surface;
+        ctx.beginPath();
+        ctx.roundRect(cardX, cardY, cardW, cardH, r);
+        ctx.fill();
+        ctx.strokeStyle = C.border;
+        ctx.lineWidth = 2;
+        ctx.stroke();
 
-        // Fonts setup
-        const sysFont = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        // Шапка — inset
+        const headH = 110;
+        ctx.save();
+        ctx.beginPath();
+        ctx.roundRect(cardX, cardY, cardW, headH, [r, r, 0, 0]);
+        ctx.fillStyle = C.inset;
+        ctx.fill();
+        ctx.restore();
+        ctx.strokeStyle = C.border;
+        ctx.beginPath();
+        ctx.moveTo(cardX, cardY + headH);
+        ctx.lineTo(cardX + cardW, cardY + headH);
+        ctx.stroke();
 
-        // Header (FINA Points Borozdov)
-        ctx.fillStyle = textMutedHex;
-        ctx.font = `600 44px ${sysFont}`;
         ctx.textAlign = 'center';
-        ctx.fillText('FINA Points / Borozdov.ru', canvas.width / 2, 100);
-
-        // Event & Pool
-        const poolStr = pool === 'SCM' ? 'Бассейн 25м' : 'Бассейн 50м';
-        ctx.fillStyle = textMainHex;
-        ctx.font = `700 76px ${sysFont}`;
-        ctx.fillText(eventStr, canvas.width / 2, 270);
-
-        ctx.fillStyle = acHex;
-        ctx.font = `600 40px ${sysFont}`;
-        ctx.fillText(poolStr, canvas.width / 2, 340);
-
-        // TIME
-        ctx.fillStyle = textMutedHex;
-        ctx.font = `800 32px ${sysFont}`;
+        ctx.fillStyle = C.slate;
+        ctx.font = `500 30px ${uiFont}`;
         ctx.letterSpacing = '4px';
-        ctx.fillText('ВРЕМЯ', canvas.width / 2, 450);
+        ctx.fillText('FINA POINTS — BY BOROZDOV', canvas.width / 2, cardY + headH / 2 + 11);
 
-        ctx.fillStyle = textMainHex;
-        ctx.font = `900 160px ${sysFont}`;
-        ctx.letterSpacing = '0px';
-        ctx.fillText(timeStr, canvas.width / 2, 600);
+        // Дистанция и бассейн
+        const poolStr = pool === 'SCM' ? 'БАССЕЙН 25М' : 'БАССЕЙН 50М';
+        ctx.fillStyle = C.text;
+        ctx.font = `600 66px ${uiFont}`;
+        ctx.letterSpacing = '-1px';
+        ctx.fillText(eventStr.toUpperCase(), canvas.width / 2, 320);
 
-        // POINTS
-        ctx.fillStyle = textMutedHex;
-        ctx.font = `800 32px ${sysFont}`;
+        ctx.fillStyle = C.slate;
+        ctx.font = `500 28px ${uiFont}`;
         ctx.letterSpacing = '4px';
-        ctx.fillText('ОЧКИ FINA', canvas.width / 2, 730);
+        ctx.fillText(poolStr, canvas.width / 2, 375);
 
-        ctx.fillStyle = acHex;
-        ctx.font = `900 160px ${sysFont}`;
-        ctx.letterSpacing = '0px';
-        ctx.fillText(ptsStr, canvas.width / 2, 880);
-
-        // Rank Badge
-        if (rank) {
-            ctx.font = `900 40px ${sysFont}`;
+        // Два блока: вторичный — обычным текстом, главный — инверсией
+        const drawSecondary = (label, value, y) => {
+            ctx.fillStyle = C.slate;
+            ctx.font = `500 26px ${uiFont}`;
+            ctx.letterSpacing = '5px';
+            ctx.fillText(label, canvas.width / 2, y);
+            ctx.fillStyle = C.soft;
+            ctx.font = `600 96px ${monoFont}`;
             ctx.letterSpacing = '0px';
-            const tw = ctx.measureText(rank).width;
-            const pLen = 30;
+            ctx.fillText(value, canvas.width / 2, y + 106);
+        };
 
-            ctx.fillStyle = acHex + (isLight ? '22' : '33');
+        // Главная цифра — инверсионная плашка
+        const drawPrimary = (label, value, y) => {
+            ctx.fillStyle = C.slate;
+            ctx.font = `500 26px ${uiFont}`;
+            ctx.letterSpacing = '5px';
+            ctx.fillText(label, canvas.width / 2, y);
+
+            ctx.font = `700 150px ${monoFont}`;
+            ctx.letterSpacing = '0px';
+            const tw = ctx.measureText(value).width;
+            const padX = 44, plateH = 190;
+            ctx.fillStyle = C.text;
             ctx.beginPath();
-            ctx.roundRect((canvas.width / 2) - (tw / 2) - pLen, 960, tw + (pLen * 2), 68, 16);
+            ctx.roundRect(canvas.width / 2 - tw / 2 - padX, y + 32, tw + padX * 2, plateH, 8);
             ctx.fill();
+            ctx.fillStyle = C.canvas;
+            ctx.fillText(value, canvas.width / 2, y + 32 + plateH / 2 + 52);
+        };
 
-            ctx.fillStyle = acHex;
-            ctx.fillText(rank, canvas.width / 2, 1006);
+        if (primary === 'time') {
+            drawSecondary('ОЧКИ FINA', ptsStr, 470);
+            drawPrimary('ВРЕМЯ', timeStr, 660);
         } else {
-            ctx.fillStyle = isLight ? '#f4f4f5' : '#27272a';
-            ctx.fillRect((canvas.width / 2) - 80, 1000, 160, 6);
+            drawSecondary('ВРЕМЯ', timeStr, 470);
+            drawPrimary('ОЧКИ FINA', ptsStr, 660);
+        }
+
+        // Разряд — инверсионный бейдж, радиус 2
+        if (rank) {
+            ctx.font = `600 34px ${uiFont}`;
+            ctx.letterSpacing = '2px';
+            const label = `РАЗРЯД ${rank.toUpperCase()}`;
+            const tw = ctx.measureText(label).width;
+            const padX = 26;
+            ctx.fillStyle = C.text;
+            ctx.fillRect(canvas.width / 2 - tw / 2 - padX, 922, tw + padX * 2, 58);
+            ctx.fillStyle = C.canvas;
+            ctx.fillText(label, canvas.width / 2, 962);
+        } else {
+            ctx.fillStyle = C.slate;
+            ctx.font = `500 26px ${uiFont}`;
+            ctx.letterSpacing = '3px';
+            ctx.fillText('FINA.BOROZDOV.RU', canvas.width / 2, 958);
         }
 
         return new Promise((resolve, reject) => {

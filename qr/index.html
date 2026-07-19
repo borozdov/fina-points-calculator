@@ -12,14 +12,15 @@
     <link rel="icon" href="/assets/img/icon-192.png" type="image/png" sizes="192x192">
     <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#101014">
+    <meta name="theme-color" content="#0d0d0d">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="FINA QR">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 
     <script>
         (function () {
@@ -29,11 +30,6 @@
                     theme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
                 }
                 document.documentElement.setAttribute('data-theme', theme);
-
-                var accent = localStorage.getItem('fina_accent');
-                if (accent) {
-                    document.documentElement.setAttribute('data-accent', accent);
-                }
             } catch (e) { }
         })();
     </script>
@@ -41,38 +37,32 @@
         /* ===== Tokens ===== */
         :root {
             --font: 'Inter', system-ui, -apple-system, sans-serif;
-            --r: 20px;
+            --tr: 0.15s ease;
         }
 
-        /* Dark theme accents */
-        [data-theme="dark"][data-accent="mono"],
         [data-theme="dark"] {
-            --bg: #101014; --sf: #1a1a22; --sf2: #22222e; --brd: rgba(255, 255, 255, 0.06); --txt: #e8e8ed; --dim: #7a7a8a;
-            --ac: #ffffff; --ac-d: rgba(255, 255, 255, 0.14); --ac-g: rgba(255, 255, 255, 0.2);
+            --canvas: #0d0d0d;
+            --inset: #121212;
+            --surface: #1a1a1a;
+            --border: #2e2e2e;
+            --border-strong: #6b6b6b;
+            --slate: #8a8a8a;
+            --soft: #d1d1d1;
+            --text: #fafafa;
+            --ring: rgba(250, 250, 250, 0.22);
         }
-        [data-theme="dark"][data-accent="purple"] { --ac: #c8a2ff; --ac-d: rgba(200, 162, 255, 0.14); --ac-g: rgba(200, 162, 255, 0.2); }
-        [data-theme="dark"][data-accent="blue"] { --ac: #6cb4ff; --ac-d: rgba(108, 180, 255, 0.14); --ac-g: rgba(108, 180, 255, 0.2); }
-        [data-theme="dark"][data-accent="green"] { --ac: #6ee7a8; --ac-d: rgba(110, 231, 168, 0.14); --ac-g: rgba(110, 231, 168, 0.2); }
-        [data-theme="dark"][data-accent="orange"] { --ac: #ffb86c; --ac-d: rgba(255, 184, 108, 0.14); --ac-g: rgba(255, 184, 108, 0.2); }
-        [data-theme="dark"][data-accent="pink"] { --ac: #ff7eb3; --ac-d: rgba(255, 126, 179, 0.14); --ac-g: rgba(255, 126, 179, 0.2); }
-        [data-theme="dark"][data-accent="cyan"] { --ac: #67e8f9; --ac-d: rgba(103, 232, 249, 0.14); --ac-g: rgba(103, 232, 249, 0.2); }
-        [data-theme="dark"][data-accent="slate"] { --ac: #cbd5e1; --ac-d: rgba(203, 213, 225, 0.14); --ac-g: rgba(203, 213, 225, 0.2); }
-        [data-theme="dark"][data-accent="zinc"] { --ac: #a1a1aa; --ac-d: rgba(161, 161, 170, 0.14); --ac-g: rgba(161, 161, 170, 0.2); }
 
-        /* Light theme accents */
-        [data-theme="light"][data-accent="mono"],
         [data-theme="light"] {
-            --bg: #f4f4f8; --sf: #ffffff; --sf2: #eeeef2; --brd: rgba(0, 0, 0, 0.08); --txt: #1a1a2e; --dim: #6b6b80;
-            --ac: #1a1a2e; --ac-d: rgba(26, 26, 46, 0.12); --ac-g: rgba(26, 26, 46, 0.2);
+            --canvas: #fafafa;
+            --inset: #ececec;
+            --surface: #ffffff;
+            --border: #e4e4e4;
+            --border-strong: #8a8a8a;
+            --slate: #6b6b6b;
+            --soft: #3d3d3d;
+            --text: #0d0d0d;
+            --ring: rgba(13, 13, 13, 0.22);
         }
-        [data-theme="light"][data-accent="purple"] { --ac: #8b5cf6; --ac-d: rgba(139, 92, 246, 0.12); --ac-g: rgba(139, 92, 246, 0.2); }
-        [data-theme="light"][data-accent="blue"] { --ac: #3b82f6; --ac-d: rgba(59, 130, 246, 0.12); --ac-g: rgba(59, 130, 246, 0.2); }
-        [data-theme="light"][data-accent="green"] { --ac: #10b981; --ac-d: rgba(16, 185, 129, 0.12); --ac-g: rgba(16, 185, 129, 0.2); }
-        [data-theme="light"][data-accent="orange"] { --ac: #f97316; --ac-d: rgba(249, 115, 22, 0.12); --ac-g: rgba(249, 115, 22, 0.2); }
-        [data-theme="light"][data-accent="pink"] { --ac: #ec4899; --ac-d: rgba(236, 72, 153, 0.12); --ac-g: rgba(236, 72, 153, 0.2); }
-        [data-theme="light"][data-accent="cyan"] { --ac: #06b6d4; --ac-d: rgba(6, 182, 212, 0.12); --ac-g: rgba(6, 182, 212, 0.2); }
-        [data-theme="light"][data-accent="slate"] { --ac: #64748b; --ac-d: rgba(100, 116, 139, 0.12); --ac-g: rgba(100, 116, 139, 0.2); }
-        [data-theme="light"][data-accent="zinc"] { --ac: #52525b; --ac-d: rgba(82, 82, 91, 0.12); --ac-g: rgba(82, 82, 91, 0.2); }
 
         *,
         *::before,
@@ -87,11 +77,15 @@
         body {
             height: 100%;
             font-family: var(--font);
-            background: var(--bg);
-            color: var(--txt);
-            transition: background 0.3s, color 0.3s;
+            background: var(--canvas);
+            color: var(--text);
             -webkit-font-smoothing: antialiased;
             overflow: hidden;
+        }
+
+        ::selection {
+            background: var(--text);
+            color: var(--canvas);
         }
 
         /* ===== Layout ===== */
@@ -106,11 +100,10 @@
 
         /* ===== Card ===== */
         .card {
-            background: var(--sf);
-            border: 1px solid var(--brd);
-            border-radius: var(--r);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
             padding: 24px;
-            box-shadow: 0 12px 64px rgba(0, 0, 0, 0.4);
             max-width: 340px;
             width: 100%;
             display: flex;
@@ -118,23 +111,19 @@
             align-items: center;
             gap: 16px;
             text-align: center;
-            animation: appear 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: appear 0.3s ease;
         }
 
         @keyframes appear {
             from {
                 opacity: 0;
-                transform: translateY(20px) scale(0.98);
+                transform: translateY(12px);
             }
 
             to {
                 opacity: 1;
-                transform: translateY(0) scale(1);
+                transform: translateY(0);
             }
-        }
-
-        [data-theme="light"] .card {
-            box-shadow: 0 12px 64px rgba(0, 0, 0, 0.08);
         }
 
         .logo {
@@ -142,73 +131,38 @@
             flex-direction: column;
             text-decoration: none;
             line-height: 1;
-            text-align: left;
+            align-items: center;
         }
 
         .logo-top {
             font-size: 1.15rem;
-            font-weight: 800;
-            color: var(--ac);
+            font-weight: 600;
+            text-transform: uppercase;
             letter-spacing: -0.02em;
+            color: var(--text);
         }
 
         .logo-bottom {
             font-size: 0.55rem;
-            font-weight: 600;
+            font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 0.15em;
-            color: var(--dim);
-            margin-top: 2.5px;
-            opacity: 0.8;
+            letter-spacing: 0.12em;
+            color: var(--slate);
+            margin-top: 3px;
         }
 
-        /* ===== QR wrapper ===== */
+        /* QR — константа: обсидиановые модули на титановой плашке */
         .qr-wrap {
-            background: var(--sf2);
-            border: 1px solid var(--brd);
-            border-radius: 16px;
-            padding: 12px;
+            background: #fafafa;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
             width: 100%;
             aspect-ratio: 1;
             max-width: 240px;
-        }
-
-        /* Decorative corners */
-        .corner {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border-color: var(--ac);
-            border-style: solid;
-            border-radius: 4px;
-        }
-
-        .lt {
-            top: 8px;
-            left: 8px;
-            border-width: 2.5px 0 0 2.5px;
-        }
-
-        .rt {
-            top: 8px;
-            right: 8px;
-            border-width: 2.5px 2.5px 0 0;
-        }
-
-        .lb {
-            bottom: 8px;
-            left: 8px;
-            border-width: 0 0 2.5px 2.5px;
-        }
-
-        .rb {
-            bottom: 8px;
-            right: 8px;
-            border-width: 0 2.5px 2.5px 0;
         }
 
         #qr-container,
@@ -217,7 +171,6 @@
             display: block;
             width: 100%;
             height: auto;
-            border-radius: 4px;
         }
 
         /* ===== Text ===== */
@@ -226,90 +179,97 @@
         }
 
         .title {
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--txt);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: -0.01em;
+            color: var(--text);
         }
 
         .subtitle {
             font-size: 0.8rem;
-            color: var(--dim);
-            margin-top: 2px;
-            font-weight: 500;
+            color: var(--slate);
+            margin-top: 4px;
+            font-weight: 400;
         }
 
-        /* ===== URL chip ===== */
-        .url-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: var(--ac-d);
-            border: 1px solid var(--ac-g);
-            border-radius: 100px;
-            padding: 6px 14px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--ac);
-            text-decoration: none;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .url-chip:hover {
-            background: var(--ac-g);
-            transform: translateY(-2px);
-        }
-
-        /* ===== Actions row ===== */
+        /* ===== Actions ===== */
         .actions-row {
             display: flex;
             gap: 8px;
             align-items: center;
-            width: 100%;
             justify-content: center;
+        }
+
+        .url-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 7px 11px;
+            font-size: 0.62rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--soft);
+            text-decoration: none;
+            white-space: nowrap;
+            transition: color var(--tr), border-color var(--tr);
+        }
+
+        .url-chip:hover {
+            color: var(--text);
+            border-color: var(--border-strong);
         }
 
         .share-btn {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: var(--ac);
-            border: none;
-            border-radius: 100px;
-            padding: 8px 18px;
-            font-size: 0.82rem;
-            font-weight: 700;
+            background: var(--text);
+            border: 1px solid var(--text);
+            border-radius: 4px;
+            padding: 7px 13px;
+            font-size: 0.62rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
             font-family: var(--font);
-            color: var(--bg);
+            color: var(--canvas);
+            white-space: nowrap;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: filter var(--tr);
         }
 
         .share-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 16px var(--ac-g);
+            filter: brightness(0.85);
         }
 
-        .share-btn:active {
-            transform: scale(0.97);
+        .share-btn:focus-visible,
+        .url-chip:focus-visible,
+        .theme-btn:focus-visible,
+        .back-btn:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px var(--ring);
         }
 
-        /* ===== Toast ===== */
+        /* ===== Toast — инверсия ===== */
         .toast {
             position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%) translateY(80px);
-            background: var(--sf);
-            color: var(--txt);
-            border: 1px solid var(--brd);
-            border-radius: 10px;
-            padding: 8px 18px;
+            background: var(--text);
+            color: var(--canvas);
+            border-radius: 6px;
+            padding: 10px 18px;
             font-size: 0.82rem;
             font-weight: 600;
             font-family: var(--font);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
             opacity: 0;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: opacity 0.3s ease, transform 0.3s ease;
             z-index: 100;
             pointer-events: none;
         }
@@ -328,41 +288,40 @@
         }
 
         .tag {
-            font-size: 0.6rem;
-            font-weight: 700;
+            font-size: 0.58rem;
+            font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--dim);
-            background: var(--bg);
-            border: 1px solid var(--brd);
-            border-radius: 6px;
+            letter-spacing: 0.12em;
+            color: var(--soft);
+            background: transparent;
+            border: 1px solid var(--border-strong);
+            border-radius: 2px;
             padding: 3px 8px;
         }
 
         .divider {
             width: 100%;
             height: 1px;
-            background: var(--brd);
+            background: var(--border);
         }
 
-        /* ===== Actions ===== */
+        /* ===== Corner buttons ===== */
         .theme-btn,
         .back-btn {
             position: fixed;
             top: 16px;
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--sf);
-            border: 1px solid var(--brd);
-            border-radius: 10px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 1.1rem;
-            color: var(--txt);
+            color: var(--slate);
             text-decoration: none;
-            transition: all 0.2s;
+            transition: color var(--tr), border-color var(--tr);
             z-index: 10;
         }
 
@@ -376,8 +335,22 @@
 
         .theme-btn:hover,
         .back-btn:hover {
-            border-color: var(--ac);
-            color: var(--ac);
+            border-color: var(--border-strong);
+            color: var(--text);
+        }
+
+        /* Иконка показывает, куда переключит клик */
+        .theme-icon-sun,
+        .theme-icon-moon {
+            display: none;
+        }
+
+        [data-theme="dark"] .theme-icon-sun {
+            display: block;
+        }
+
+        [data-theme="light"] .theme-icon-moon {
+            display: block;
         }
 
         @media (max-height: 500px) {
@@ -397,18 +370,45 @@
                 height: 160px;
             }
         }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
     </style>
 </head>
 
 <body>
     <a href="../" class="back-btn" aria-label="Назад" title="Назад">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
             <line x1="19" y1="12" x2="5" y2="12"></line>
             <polyline points="12 19 5 12 12 5"></polyline>
         </svg>
     </a>
-    <button class="theme-btn" id="theme-btn" aria-label="Тема">🌙</button>
+    <button class="theme-btn" id="theme-btn" aria-label="Переключить тему">
+        <svg class="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2"></path>
+            <path d="M12 20v2"></path>
+            <path d="m4.93 4.93 1.41 1.41"></path>
+            <path d="m17.66 17.66 1.41 1.41"></path>
+            <path d="M2 12h2"></path>
+            <path d="M20 12h2"></path>
+            <path d="m6.34 17.66-1.41 1.41"></path>
+            <path d="m19.07 4.93-1.41 1.41"></path>
+        </svg>
+        <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+        </svg>
+    </button>
 
     <main class="page">
         <article class="card">
@@ -418,21 +418,17 @@
             </a>
 
             <div class="qr-wrap">
-                <div class="corner lt"></div>
-                <div class="corner rt"></div>
-                <div class="corner lb"></div>
-                <div class="corner rb"></div>
                 <div id="qr-container"></div>
             </div>
 
             <div class="info">
                 <p class="title">Калькулятор очков FINA</p>
-                <p class="subtitle">Отсканируй, чтобы открыть сайт</p>
+                <p class="subtitle">Отсканируйте, чтобы открыть сайт</p>
             </div>
 
             <div class="actions-row">
                 <a href="https://fina.borozdov.ru/" class="url-chip">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10" />
                         <path d="M2 12h20" />
@@ -442,7 +438,7 @@
                     fina.borozdov.ru
                 </a>
                 <button type="button" class="share-btn" id="share-qr-btn" aria-label="Поделиться">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round">
                         <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
                         <polyline points="16 6 12 2 8 6"></polyline>
@@ -455,45 +451,109 @@
             <div class="divider"></div>
 
             <div class="tags">
-                <span class="tag">📱 PWA</span>
-                <span class="tag">⚡ OFF-LINE</span>
-                <span class="tag">🏆 RECORDS</span>
+                <span class="tag">PWA</span>
+                <span class="tag">Оффлайн</span>
+                <span class="tag">Рекорды</span>
             </div>
         </article>
     </main>
 
-    <div class="toast" id="toast">Ссылка скопирована!</div>
+    <div class="toast" id="toast">Ссылка скопирована</div>
 
     <!-- QR Library -->
     <script src="/js/lib/qrcode.min.js"></script>
     <script>
         const themeBtn = document.getElementById('theme-btn');
-        let qrInstance = null;
 
         function updateTheme(t) {
             document.documentElement.setAttribute('data-theme', t);
-            if (themeBtn) themeBtn.textContent = t === 'dark' ? '🌙' : '☀️';
-            setTimeout(renderQR, 50);
         }
 
+        // QR — константа вне зеркала: #0d0d0d на #fafafa в обоих ликах.
+        // Кастомная отрисовка: жёсткая сетка модулей, монолитные «глаза»,
+        // обсидиановая печать с литерой в центре (уровень коррекции H).
         function renderQR() {
             const container = document.getElementById('qr-container');
-            if (!container) return;
-            
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            // Always monochrome colors for QR
-            const color = isDark ? '#ffffff' : '#1a1a2e';
-            const bg = isDark ? '#22222e' : '#eeeef2';
+            if (!container || typeof QRCode === 'undefined') return;
+
+            const OBSIDIAN = '#0d0d0d', TITAN = '#fafafa';
+
+            // Матрица — из скрытого экземпляра библиотеки
+            const probe = document.createElement('div');
+            const qr = new QRCode(probe, {
+                text: 'https://fina.borozdov.ru/',
+                width: 10,
+                height: 10,
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            const model = qr._oQRCode;
+            if (!model) return;
+            const n = model.getModuleCount();
+
+            const cell = 16, quiet = 1;
+            const size = (n + quiet * 2) * cell;
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = TITAN;
+            ctx.fillRect(0, 0, size, size);
+
+            const inEye = (r, c) => (r < 7 && c < 7) || (r < 7 && c >= n - 7) || (r >= n - 7 && c < 7);
+
+            // Центральная печать (при H допустимо до 30% перекрытия — тут ~7%)
+            const span = n >= 29 ? 9 : 7;
+            const start = Math.floor((n - span) / 2), end = start + span - 1;
+            const inSeal = (r, c) => r >= start && r <= end && c >= start && c <= end;
+
+            // Модули данных — сплошные полновесные квадраты
+            ctx.fillStyle = OBSIDIAN;
+            for (let r = 0; r < n; r++) {
+                for (let c = 0; c < n; c++) {
+                    if (inEye(r, c) || inSeal(r, c) || !model.isDark(r, c)) continue;
+                    ctx.fillRect((quiet + c) * cell, (quiet + r) * cell, cell, cell);
+                }
+            }
+
+            // Глаза — монолит без скруглений
+            const drawEye = (row, col) => {
+                const x = (quiet + col) * cell, y = (quiet + row) * cell;
+                ctx.fillStyle = OBSIDIAN;
+                ctx.fillRect(x, y, 7 * cell, 7 * cell);
+                ctx.fillStyle = TITAN;
+                ctx.fillRect(x + cell, y + cell, 5 * cell, 5 * cell);
+                ctx.fillStyle = OBSIDIAN;
+                ctx.fillRect(x + 2 * cell, y + 2 * cell, 3 * cell, 3 * cell);
+            };
+            drawEye(0, 0);
+            drawEye(0, n - 7);
+            drawEye(n - 7, 0);
+
+            // Печать: обсидиановый квадрат + титановая литера
+            const sx = (quiet + start) * cell, sy = sx;
+            const sSize = span * cell, pad = cell * 0.3;
+            ctx.fillStyle = OBSIDIAN;
+            if (ctx.roundRect) {
+                ctx.beginPath();
+                ctx.roundRect(sx + pad, sy + pad, sSize - pad * 2, sSize - pad * 2, cell * 0.4);
+                ctx.fill();
+            } else {
+                ctx.fillRect(sx + pad, sy + pad, sSize - pad * 2, sSize - pad * 2);
+            }
+            ctx.fillStyle = TITAN;
+            ctx.font = `600 ${Math.round(sSize * 0.5)}px Inter, system-ui, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('F', sx + sSize / 2, sy + sSize / 2 + sSize * 0.03);
 
             container.innerHTML = '';
-            qrInstance = new QRCode(container, {
-                text: "https://fina.borozdov.ru/",
-                width: 200,
-                height: 200,
-                colorDark: color,
-                colorLight: bg,
-                correctLevel: QRCode.CorrectLevel.M
-            });
+            container.appendChild(canvas);
+        }
+
+        // Литера рисуется шрифтом страницы — перерисовать, когда Inter догрузится
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(() => renderQR());
         }
 
         // Listen for theme changes from other tabs
@@ -522,7 +582,7 @@
         document.getElementById('share-qr-btn').addEventListener('click', async () => {
             const shareData = {
                 title: 'Калькулятор очков FINA',
-                text: '🏊 Калькулятор очков FINA — расчёт очков по времени и времени по очкам. Работает оффлайн!',
+                text: 'Калькулятор очков FINA — расчёт очков по времени и времени по очкам. Работает оффлайн.',
                 url: 'https://fina.borozdov.ru/'
             };
             try {

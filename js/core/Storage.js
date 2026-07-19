@@ -18,12 +18,4 @@ export class StorageManager {
     static saveTheme(t) {
         localStorage.setItem('fina_theme', t);
     }
-
-    static getAccent() {
-        return localStorage.getItem('fina_accent');
-    }
-
-    static saveAccent(c) {
-        localStorage.setItem('fina_accent', c);
-    }
 }

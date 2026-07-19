@@ -1,10 +1,10 @@
 const STATUS_BAR_COLORS = {
     dark: {
-        background: '#101014',
+        background: '#0d0d0d',
         style: 'DARK'
     },
     light: {
-        background: '#f4f4f8',
+        background: '#fafafa',
         style: 'LIGHT'
     }
 };

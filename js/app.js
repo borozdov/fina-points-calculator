@@ -69,9 +69,7 @@ class App {
         this.donateBtn = get('donate-btn');
 
         this.themeToggle = get('theme-toggle');
-        this.themeIcon = get('theme-icon');
-        this.colorToggle = get('color-toggle');
-        this.colorPicker = get('color-picker');
+        this.metaThemeColor = get('meta-theme-color');
     }
 
     bindEvents() {
@@ -80,30 +78,6 @@ class App {
                 const cur = document.documentElement.getAttribute('data-theme');
                 this.setTheme(cur === 'dark' ? 'light' : 'dark');
             };
-        }
-
-        if (this.colorToggle && this.colorPicker) {
-            this.colorToggle.onclick = (e) => {
-                e.stopPropagation();
-                this.colorPicker.classList.toggle('hidden');
-            };
-            
-            // Close color picker when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!this.colorPicker.classList.contains('hidden') && 
-                    !this.colorPicker.contains(e.target) && 
-                    e.target !== this.colorToggle) {
-                    this.colorPicker.classList.add('hidden');
-                }
-            });
-
-            this.colorPicker.querySelectorAll('.color-dot').forEach(d => {
-                d.onclick = (e) => {
-                    e.stopPropagation();
-                    this.setAccent(d.dataset.color);
-                    this.colorPicker.classList.add('hidden');
-                };
-            });
         }
 
         if (this.fTime) {
@@ -156,14 +130,14 @@ class App {
         if (this.favPts) this.favPts.onclick = () => {
             if (!this.rPts || !this.rPts.classList.contains('ok')) return;
             let t = (this.tQ && this.tQ.value.trim()) ? parseT(this.tQ.value) : this.fieldT();
-            this.toggleFav(`⏱ ${fmt(t)}`, RU[this.state.curEvent] || this.state.curEvent, `${this.rPtsV.textContent} очк.`, {
+            this.toggleFav(fmt(t), RU[this.state.curEvent] || this.state.curEvent, `${this.rPtsV.textContent} очк.`, {
                 mode: this.state.curMode, pool: this.state.pool, gender: this.state.gender, eventKey: this.state.curEvent, value: t
             });
         };
 
         if (this.favTime) this.favTime.onclick = () => {
             if (!this.rTime || !this.rTime.classList.contains('ok')) return;
-            this.toggleFav(`🎯 ${this.pIn.value} очк.`, RU[this.state.curEvent] || this.state.curEvent, this.rTimeV.textContent, {
+            this.toggleFav(`${this.pIn.value} очк.`, RU[this.state.curEvent] || this.state.curEvent, this.rTimeV.textContent, {
                 mode: this.state.curMode, pool: this.state.pool, gender: this.state.gender, eventKey: this.state.curEvent, value: +this.pIn.value
             });
         };
@@ -240,35 +214,51 @@ class App {
             const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
             this.setTheme(prefersLight ? 'light' : 'dark');
         }
-        this.setAccent(StorageManager.getAccent() || 'mono');
     }
 
     setTheme(t) {
-        document.documentElement.setAttribute('data-theme', t);
-        this.themeIcon.textContent = t === 'dark' ? '🌙' : '☀️';
+        // Смена лика мгновенна — без transition-каскада на цветах
+        const root = document.documentElement;
+        root.classList.add('theme-switching');
+        root.setAttribute('data-theme', t);
+        void root.offsetHeight; // фиксируем новые цвета при выключенных transition
+        root.classList.remove('theme-switching');
+        if (this.metaThemeColor) this.metaThemeColor.content = t === 'light' ? '#fafafa' : '#0d0d0d';
         StorageManager.saveTheme(t);
         syncNativeChrome(t);
     }
 
-    setAccent(c) {
-        document.documentElement.setAttribute('data-accent', c);
-        StorageManager.saveAccent(c);
-        this.colorPicker.querySelectorAll('.color-dot').forEach(d => {
-            d.classList.toggle('active', d.dataset.color === c);
-        });
-    }
-
     initKeyboardMode() {
+        // Компактный режим — только на сенсорных устройствах и только когда
+        // экранная клавиатура реально открыта (видимый viewport стал заметно ниже).
+        // На десктопе фокус в поле ввода ничего не сжимает.
+        const vv = window.visualViewport;
+        const isTouch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+        if (!vv || !isTouch) return;
+
         const root = document.documentElement;
         const keyboardFields = 'input[type="text"], input[type="number"], textarea';
-        const setViewportHeight = () => {
-            const height = window.visualViewport?.height || window.innerHeight;
-            root.style.setProperty('--keyboard-app-height', `${Math.max(360, Math.floor(height))}px`);
-        };
-        const setOpen = (open) => {
-            setViewportHeight();
+        const KEYBOARD_MIN_HEIGHT = 140; // меньше — это схлопывание адресной строки, не клавиатура
+        let baseHeight = Math.max(window.innerHeight, vv.height);
+
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                baseHeight = Math.max(window.innerHeight, vv.height);
+                update();
+            }, 300);
+        });
+
+        const update = () => {
+            if (vv.height > baseHeight) baseHeight = vv.height;
+            const keyboardVisible = baseHeight - vv.height > KEYBOARD_MIN_HEIGHT;
+            const fieldFocused = document.activeElement?.matches?.(keyboardFields);
+            const open = keyboardVisible && fieldFocused;
+            const wasOpen = root.classList.contains('keyboard-open');
+
+            root.style.setProperty('--keyboard-app-height', `${Math.max(360, Math.floor(vv.height))}px`);
             root.classList.toggle('keyboard-open', open);
-            if (open) {
+
+            if (open && !wasOpen) {
                 setTimeout(() => {
                     const active = document.activeElement;
                     if (active?.matches?.(keyboardFields)) {
@@ -278,19 +268,9 @@ class App {
             }
         };
 
-        window.visualViewport?.addEventListener('resize', () => {
-            if (root.classList.contains('keyboard-open')) setViewportHeight();
-        });
-
-        document.addEventListener('focusin', (event) => {
-            if (event.target?.matches?.(keyboardFields)) setOpen(true);
-        });
-
-        document.addEventListener('focusout', () => {
-            setTimeout(() => {
-                if (!document.activeElement?.matches?.(keyboardFields)) setOpen(false);
-            }, 80);
-        });
+        vv.addEventListener('resize', update);
+        document.addEventListener('focusin', () => setTimeout(update, 100));
+        document.addEventListener('focusout', () => setTimeout(update, 100));
     }
 
     fieldT() {
@@ -357,8 +337,8 @@ class App {
         this.grid.innerHTML = '';
 
         if (!ev) {
-            this.styleGrid.innerHTML = '<span style="color:var(--dim);font-size:.8rem">—</span>';
-            this.grid.innerHTML = '<span style="color:var(--dim);font-size:.8rem">—</span>';
+            this.styleGrid.innerHTML = '<span style="color:var(--slate);font-size:.8rem">—</span>';
+            this.grid.innerHTML = '<span style="color:var(--slate);font-size:.8rem">—</span>';
             this.state.curEvent = '';
             return;
         }
@@ -463,7 +443,7 @@ class App {
         const { favs, curEvent } = this.state;
         if (this.rPts.classList.contains('ok')) {
             let t = this.tQ.value.trim() ? parseT(this.tQ.value) : this.fieldT();
-            const inputStr = `⏱ ${fmt(t)}`;
+            const inputStr = fmt(t);
             const eventStr = RU[curEvent] || curEvent;
             const resultStr = `${this.rPtsV.textContent} очк.`;
             this.favPts.classList.toggle('saved', favs.some(f => f.input === inputStr && f.event === eventStr && f.result === resultStr));
@@ -472,7 +452,7 @@ class App {
         }
 
         if (this.rTime.classList.contains('ok')) {
-            const inputStr = `🎯 ${this.pIn.value} очк.`;
+            const inputStr = `${this.pIn.value} очк.`;
             const eventStr = RU[curEvent] || curEvent;
             const resultStr = this.rTimeV.textContent;
             this.favTime.classList.toggle('saved', favs.some(f => f.input === inputStr && f.event === eventStr && f.result === resultStr));
@@ -492,7 +472,9 @@ class App {
                 div.onclick = () => this.loadState(h.raw);
             }
 
-            div.innerHTML = `<div class="hi-body"><span class="hi-event">${h.event}</span><span><span>${h.input}</span><span class="hi-arrow">→</span><span class="hi-result">${h.result}</span></span></div><button type="button" class="hi-del" aria-label="Удалить" data-id="${h.id}">✕</button>`;
+            // Старые записи могли сохраняться с эмодзи-префиксом — убираем его при выводе
+            const inputStr = String(h.input).replace(/^[^\d]+/, '');
+            div.innerHTML = `<div class="hi-body"><span class="hi-event">${h.event}</span><span><span class="hi-input">${inputStr}</span><span class="hi-arrow">→</span><span class="hi-result">${h.result}</span></span></div><button type="button" class="hi-del" aria-label="Удалить" data-id="${h.id}">&times;</button>`;
             this.histList.appendChild(div);
         });
 
@@ -556,12 +538,7 @@ class App {
         }
 
         const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-        let acHex = getComputedStyle(document.documentElement).getPropertyValue('--ac').trim();
-        if (!acHex.startsWith('#')) {
-            acHex = isLight ? '#a855f7' : '#c8a2ff';
-        }
-
-        const themeConfig = { pool, isLight, acHex };
+        const themeConfig = { pool, isLight, primary: type };
         ShareManager.shareResult({ timeStr, ptsStr, eventStr, rank, themeConfig }, (msg) => this.showToast(msg));
     }
 }

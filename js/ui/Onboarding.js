@@ -4,20 +4,20 @@ export class Onboarding {
         this.steps = [
             {
                 target: '.row',
-                title: '👋 Добро пожаловать!',
-                text: 'Выберите бассейн (25м или 50м) и пол спортсмена',
+                title: 'Бассейн и пол',
+                text: 'Выберите бассейн (25м или 50м) и пол спортсмена.',
                 position: 'bottom'
             },
             {
                 target: '.events-row',
-                title: '🏊 Стиль и дистанция',
-                text: 'Выберите стиль плавания и дистанцию для расчёта',
+                title: 'Стиль и дистанция',
+                text: 'Выберите стиль плавания и дистанцию для расчёта.',
                 position: 'bottom'
             },
             {
                 target: '.calc',
-                title: '⏱ Рассчитайте очки',
-                text: 'Введите время — и получите очки FINA. Или наоборот!',
+                title: 'Результат',
+                text: 'Введите время — получите очки FINA. Или наоборот.',
                 position: 'top'
             }
         ];
@@ -47,7 +47,7 @@ export class Onboarding {
         this.tooltip.innerHTML = `
             <div class="onboarding-header">
                 <span class="onboarding-title"></span>
-                <button type="button" class="onboarding-skip" aria-label="Пропустить">✕</button>
+                <button type="button" class="onboarding-skip" aria-label="Пропустить">&times;</button>
             </div>
             <p class="onboarding-text"></p>
             <div class="onboarding-footer">
@@ -71,7 +71,7 @@ export class Onboarding {
                     <rect id="onboarding-hole" rx="14" ry="14" fill="black"/>
                 </mask>
             </defs>
-            <rect width="100%" height="100%" fill="rgba(0,0,0,0.65)" mask="url(#onboarding-mask)"/>
+            <rect width="100%" height="100%" fill="var(--scrim)" mask="url(#onboarding-mask)"/>
         `;
 
         this.overlay.appendChild(this.spotlightSvg);
@@ -113,7 +113,7 @@ export class Onboarding {
         const prevBtn = this.tooltip.querySelector('.onboarding-prev');
         const nextBtn = this.tooltip.querySelector('.onboarding-next');
         prevBtn.style.visibility = idx === 0 ? 'hidden' : 'visible';
-        nextBtn.textContent = idx === this.steps.length - 1 ? 'Начать!' : 'Далее';
+        nextBtn.textContent = idx === this.steps.length - 1 ? 'Начать' : 'Далее';
 
         // Position spotlight
         const rect = el.getBoundingClientRect();

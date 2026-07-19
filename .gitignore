@@ -39,3 +39,6 @@ android/signing/*.properties
 *.aab
 rustore/fina-points-rustore-pack.zip
 rustore/aab-signature/pepk_out.zip
+
+# Claude local config
+.claude/
