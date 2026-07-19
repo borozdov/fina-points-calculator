@@ -74,10 +74,9 @@ class App {
 
     bindEvents() {
         if (this.themeToggle) {
-            // Трёхтактный цикл: тёмный → светлый → авто (по системе) → тёмный
             this.themeToggle.onclick = () => {
-                this.themeMode = { dark: 'light', light: 'auto', auto: 'dark' }[this.themeMode] || 'dark';
-                this.applyThemeMode(true);
+                const cur = document.documentElement.getAttribute('data-theme');
+                this.setTheme(cur === 'dark' ? 'light' : 'dark', true);
             };
         }
 
@@ -208,47 +207,19 @@ class App {
     }
 
     initTheme() {
-        // Ключ сменён с fina_theme на fina_lik: старый писался и при автовыборе,
-        // из-за чего тема замораживалась и переставала следовать за системной.
-        // Сохраняется только ручной выбор; режим 'auto' следует за средой.
+        // Ключ сменён с fina_theme на fina_lik. Автопереключение убрано:
+        // системная тема используется только как стартовое значение при первом
+        // визите (когда ручной выбор ещё не сохранён); дальше — только toggle,
+        // без слежения за live-изменениями prefers-color-scheme.
         try { localStorage.removeItem('fina_theme'); } catch (e) { }
 
-        this.themeMedia = window.matchMedia ? window.matchMedia('(prefers-color-scheme: light)') : null;
         const saved = StorageManager.getTheme();
-        this.themeMode = (saved === 'dark' || saved === 'light') ? saved : 'auto';
-        this.applyThemeMode(false);
-
-        this.themeMedia?.addEventListener('change', () => {
-            if (this.themeMode === 'auto') this.applyThemeMode(false);
-        });
+        const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        const initial = (saved === 'dark' || saved === 'light') ? saved : (prefersLight ? 'light' : 'dark');
+        this.setTheme(initial);
     }
 
-    applyThemeMode(persist) {
-        const mode = this.themeMode;
-        const effective = mode === 'auto'
-            ? ((this.themeMedia && this.themeMedia.matches) ? 'light' : 'dark')
-            : mode;
-
-        document.documentElement.setAttribute('data-theme-mode', mode);
-        this.setTheme(effective);
-
-        if (persist) {
-            if (mode === 'auto') StorageManager.clearTheme();
-            else StorageManager.saveTheme(mode);
-        }
-
-        if (this.themeToggle) {
-            const next = {
-                dark: 'Светлый лик',
-                light: 'Авто — следовать за системой',
-                auto: 'Тёмный лик'
-            }[mode];
-            this.themeToggle.title = next;
-            this.themeToggle.setAttribute('aria-label', `Переключить тему: ${next}`);
-        }
-    }
-
-    setTheme(t) {
+    setTheme(t, persist = false) {
         // Смена лика мгновенна — без transition-каскада на цветах
         const root = document.documentElement;
         root.classList.add('theme-switching');
@@ -257,6 +228,13 @@ class App {
         root.classList.remove('theme-switching');
         if (this.metaThemeColor) this.metaThemeColor.content = t === 'light' ? '#fafafa' : '#0d0d0d';
         syncNativeChrome(t);
+        if (persist) StorageManager.saveTheme(t);
+
+        if (this.themeToggle) {
+            const next = t === 'dark' ? 'Светлый лик' : 'Тёмный лик';
+            this.themeToggle.title = next;
+            this.themeToggle.setAttribute('aria-label', `Переключить тему: ${next}`);
+        }
     }
 
     initKeyboardMode() {

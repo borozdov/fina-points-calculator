@@ -106,12 +106,14 @@
     <script>
         (function () {
             try {
+                // Автопереключение убрано: системная тема — только стартовое
+                // значение при первом визите, дальше решает исключительно
+                // ручной выбор из localStorage.
                 var stored = localStorage.getItem('fina_lik');
                 var theme = (stored === 'dark' || stored === 'light')
                     ? stored
                     : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
                 document.documentElement.setAttribute('data-theme', theme);
-                document.documentElement.setAttribute('data-theme-mode', stored || 'auto');
             } catch (e) { }
         })();
     </script>
@@ -284,13 +286,6 @@
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                         aria-hidden="true">
                         <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
-                    </svg>
-                    <svg class="theme-icon-auto" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        aria-hidden="true">
-                        <rect x="2" y="3" width="20" height="14" rx="2"></rect>
-                        <line x1="8" y1="21" x2="16" y2="21"></line>
-                        <line x1="12" y1="17" x2="12" y2="21"></line>
                     </svg>
                 </button>
             </div>

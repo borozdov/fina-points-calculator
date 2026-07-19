@@ -18,8 +18,4 @@ export class StorageManager {
     static saveTheme(t) {
         localStorage.setItem('fina_lik', t);
     }
-
-    static clearTheme() {
-        localStorage.removeItem('fina_lik');
-    }
 }
