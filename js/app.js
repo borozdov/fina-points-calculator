@@ -7,6 +7,7 @@ import { ShareManager } from './ui/Share.js';
 import { PWAInstall } from './ui/PWAInstall.js';
 import { Onboarding } from './ui/Onboarding.js';
 import { syncNativeChrome } from './ui/NativeChrome.js';
+import { trackGoal } from './helpers/analytics.js';
 
 class App {
     constructor() {
@@ -160,6 +161,7 @@ class App {
 
         if (this.donateBtn) {
             this.donateBtn.onclick = async (e) => {
+                trackGoal('donate_click');
                 const url = this.donateBtn.href;
                 const Browser = window.Capacitor?.Plugins?.Browser;
                 if (!Browser?.open) return;
@@ -299,6 +301,7 @@ class App {
 
         if (val !== null) {
             this.rPtsV.innerHTML = isMax ? `<span style="font-size:0.65em; opacity:0.6; font-weight:600; vertical-align:middle; margin-right:2px;">&gt;</span>9999` : val;
+            if (!this._firedCalcTime) { this._firedCalcTime = true; trackGoal('calc_time_to_points'); }
         } else {
             this.rPtsV.innerHTML = '—';
         }
@@ -331,6 +334,7 @@ class App {
 
         this.rTimeV.textContent = fmt(t);
         this.rTime.classList.toggle('ok', true);
+        if (!this._firedCalcPoints) { this._firedCalcPoints = true; trackGoal('calc_points_to_time'); }
 
         const rank = Calculator.getRank(this.state.pool, this.state.gender, this.state.curEvent, t);
         this.rTimeRank.textContent = rank;
@@ -442,6 +446,7 @@ class App {
         } else {
             favs.unshift({ input, event: eventStr, result: resultStr, raw, id: Date.now() });
             if (favs.length > 30) favs.pop();
+            trackGoal('add_favorite');
         }
         StorageManager.saveFavs(favs);
         this.renderFavs();
@@ -532,6 +537,7 @@ class App {
     }
 
     shareResult(type) {
+        trackGoal('share_result', { type });
         const { curEvent, pool } = this.state;
         let timeStr, ptsStr, rank = "";
         const eventStr = RU[curEvent] || curEvent;

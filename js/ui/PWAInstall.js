@@ -1,3 +1,5 @@
+import { trackGoal } from '../helpers/analytics.js';
+
 export class PWAInstall {
     constructor() {
         this.installBtn = document.getElementById('install-btn');
@@ -82,6 +84,7 @@ export class PWAInstall {
             this.deferredPrompt.prompt();
             const { outcome } = await this.deferredPrompt.userChoice;
             if (outcome === 'accepted') {
+                trackGoal('pwa_install_accepted');
                 this.installBtn.style.display = 'none';
                 this.hideModal();
                 this.hideBanner();
