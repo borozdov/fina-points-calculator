@@ -42,3 +42,6 @@ rustore/aab-signature/pepk_out.zip
 
 # Claude local config
 .claude/
+
+# Store screenshots
+FINA_screens_horizontal/
