@@ -67,7 +67,7 @@ class App {
         this.sharePtsBtn = get('share-pts');
         this.shareTimeBtn = get('share-time');
         this.toastEl = get('toast');
-        this.donateBtn = get('donate-btn');
+        this.authorExit = get('author-exit');
 
         this.themeToggle = get('theme-toggle');
         this.metaThemeColor = get('meta-theme-color');
@@ -159,13 +159,14 @@ class App {
         if (this.sharePtsBtn) this.sharePtsBtn.onclick = () => this.shareResult('pts');
         if (this.shareTimeBtn) this.shareTimeBtn.onclick = () => this.shareResult('time');
 
-        if (this.donateBtn) {
-            this.donateBtn.onclick = async (e) => {
-                trackGoal('donate_click');
-                const url = this.donateBtn.href;
+        if (this.authorExit) {
+            this.authorExit.onclick = async (e) => {
+                trackGoal('to_site');
+                const url = this.authorExit.href;
                 const Browser = window.Capacitor?.Plugins?.Browser;
                 if (!Browser?.open) return;
 
+                // В нативной обёртке переход в той же вкладке подменил бы приложение
                 e.preventDefault();
                 try {
                     await Browser.open({ url });

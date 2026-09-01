@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fina-calc-v15';
+const CACHE_NAME = 'fina-calc-v16';
 const ASSETS_TO_CACHE = [
     '/',
     '/index.html',
@@ -8,6 +8,7 @@ const ASSETS_TO_CACHE = [
     '/js/data/standards.js',
     '/js/data/world_records.js',
     '/js/helpers/utils.js',
+    '/js/helpers/analytics.js',
     '/js/core/Calculator.js',
     '/js/core/Storage.js',
     '/js/ui/Share.js',

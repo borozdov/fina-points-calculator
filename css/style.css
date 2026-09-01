@@ -356,6 +356,7 @@ body {
 
 .form {
     flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -762,6 +763,68 @@ body {
     display: none;
 }
 
+/* ===== Author exit ===== */
+.author-exit {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--soft);
+    transition: background var(--tr), color var(--tr), border-color var(--tr);
+}
+
+.author-exit-label {
+    font-size: 0.55rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--slate);
+    transition: color var(--tr);
+}
+
+.author-exit-line {
+    font-size: 0.72rem;
+    line-height: 1.35;
+}
+
+.author-exit-cta {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text);
+    transition: color var(--tr);
+}
+
+.author-exit:hover,
+.author-exit:focus-visible,
+.author-exit:active {
+    background: var(--text);
+    border-color: var(--text);
+    color: var(--canvas);
+}
+
+.author-exit:hover .author-exit-label,
+.author-exit:hover .author-exit-cta,
+.author-exit:focus-visible .author-exit-label,
+.author-exit:focus-visible .author-exit-cta,
+.author-exit:active .author-exit-label,
+.author-exit:active .author-exit-cta {
+    color: inherit;
+}
+
+@media (max-height: 640px) {
+    .author-exit {
+        padding: 7px 10px;
+        gap: 2px;
+    }
+}
+
 /* ===== Footer ===== */
 .footer {
     flex-shrink: 0;
@@ -811,6 +874,7 @@ body {
 }
 
 .keyboard-open .history-section,
+.keyboard-open .author-exit,
 .keyboard-open .footer {
     display: none !important;
 }
