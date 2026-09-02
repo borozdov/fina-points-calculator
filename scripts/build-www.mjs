@@ -6,10 +6,8 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const webDir = path.join(root, 'www');
 
 const entries = [
-    '404.html',
     'assets/img',
     'css',
-    'data',
     'index.html',
     'js',
     'manifest.json',

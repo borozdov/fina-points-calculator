@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fina-calc-v17';
+const CACHE_NAME = 'fina-calc-v18';
 const ASSETS_TO_CACHE = [
     '/',
     '/index.html',
@@ -15,7 +15,6 @@ const ASSETS_TO_CACHE = [
     '/js/ui/PWAInstall.js',
     '/js/ui/Onboarding.js',
     '/js/ui/NativeChrome.js',
-    '/data/swimming_standards.json',
     '/manifest.json',
     '/robots.txt',
     '/assets/img/favicon.png',
