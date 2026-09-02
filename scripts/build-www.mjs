@@ -1,4 +1,4 @@
-import { cp, mkdir, rm } from 'node:fs/promises';
+import { access, cp, mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -7,7 +7,6 @@ const webDir = path.join(root, 'www');
 
 const entries = [
     '404.html',
-    'CNAME',
     'assets/img',
     'css',
     'data',
@@ -18,6 +17,22 @@ const entries = [
     'sitemap.xml',
     'sw.js'
 ];
+
+// Сначала проверяем, потом удаляем. www/ сносится целиком, поэтому падение на середине
+// копирования оставляло бы огрызок сборки — а Capacitor упаковал бы его молча.
+const missing = [];
+for (const entry of entries) {
+    try {
+        await access(path.join(root, entry));
+    } catch {
+        missing.push(entry);
+    }
+}
+
+if (missing.length) {
+    console.error(`Missing sources, build aborted (www/ left untouched):\n${missing.map(e => `  ${e}`).join('\n')}`);
+    process.exit(1);
+}
 
 await rm(webDir, { recursive: true, force: true });
 await mkdir(webDir, { recursive: true });
