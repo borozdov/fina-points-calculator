@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fina-calc-v16';
+const CACHE_NAME = 'fina-calc-v17';
 const ASSETS_TO_CACHE = [
     '/',
     '/index.html',
@@ -53,25 +53,52 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+    const request = event.request;
+    const url = new URL(request.url);
+
+    if (request.method !== 'GET') return;
+
+    // Чужие origin (Метрика, шрифты) не кэшируем — пусть идут в сеть напрямую
+    if (url.origin !== self.location.origin) return;
+
+    // Stale-while-revalidate: кэш отдаём сразу, свежее тянем в фоне и кладём в кэш.
+    // Офлайн продолжает работать, а обновление доезжает со следующей загрузки —
+    // без этого можно было получить новый index.html со старым style.css.
     event.respondWith(
-        caches.match(event.request)
-            .then((response) => {
-                // Return cached version or fetch from network
-                return response || fetch(event.request).then((fetchResponse) => {
-                    // Verify valid response
-                    if (!fetchResponse || fetchResponse.status !== 200 || fetchResponse.type !== 'basic') {
-                        return fetchResponse;
+        // ignoreSearch: приход с рекламной меткой (?utm_*) должен попадать в тот же
+        // кэш, что и чистый адрес, — иначе офлайн по такой ссылке не работает
+        caches.open(CACHE_NAME).then((cache) => cache.match(request, { ignoreSearch: true }).then((cached) => {
+            // cache: 'no-cache' — условный запрос к серверу мимо HTTP-кэша браузера.
+            // Без этого ревалидация возвращала бы те же старые байты из кэша браузера
+            // и Cache Storage никогда бы не обновлялся.
+            const network = fetch(request.url, { cache: 'no-cache', credentials: 'same-origin' })
+                .then((response) => {
+                    // Навигацию нельзя удовлетворить перенаправленным ответом — браузер
+                    // бросит TypeError, и страница просто не откроется. Так ломался
+                    // переход на /qr: сервер отдаёт 308 на /qr/, fetch по умолчанию идёт
+                    // по редиректу, и сюда приходит response.redirected = true.
+                    // Отдаём сам редирект — по нему браузер сходит сам.
+                    if (request.mode === 'navigate' && response.redirected) {
+                        return Response.redirect(response.url, 301);
                     }
 
-                    // Clone response and add to cache
-                    const responseToCache = fetchResponse.clone();
-                    caches.open(CACHE_NAME)
-                        .then((cache) => {
-                            cache.put(event.request, responseToCache);
-                        });
-
-                    return fetchResponse;
+                    // Адреса с меткой в кэш не кладём, иначе он растёт на каждую метку
+                    if (response && response.status === 200 && response.type === 'basic' && !url.search) {
+                        cache.put(request, response.clone());
+                    }
+                    return response;
+                })
+                .catch((err) => {
+                    if (cached) return cached;
+                    throw err;
                 });
-            })
+
+            if (cached) {
+                event.waitUntil(network);
+                return cached;
+            }
+
+            return network;
+        }))
     );
 });

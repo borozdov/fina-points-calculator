@@ -37,6 +37,7 @@ export class PWAInstall {
         });
 
         this.installBtn.onclick = () => {
+            trackGoal('install_open');
             if (this.isIOS()) {
                 this.iosInstruction.style.display = 'block';
                 this.installActionBtn.style.display = 'none';
@@ -49,19 +50,27 @@ export class PWAInstall {
             this.installModal.classList.add('active');
         };
 
-        this.closeModal.onclick = () => this.hideModal();
+        this.closeModal.onclick = () => {
+            trackGoal('install_modal_close');
+            this.hideModal();
+        };
         this.installModal.onclick = (e) => {
             if (e.target === this.installModal) this.hideModal();
         };
 
         this.installActionBtn.onclick = async () => {
+            trackGoal('install_modal_action');
             await this.promptInstall();
         };
 
         // Banner events
-        this.bannerClose.onclick = () => this.hideBanner();
+        this.bannerClose.onclick = () => {
+            trackGoal('install_banner_close');
+            this.hideBanner();
+        };
 
         this.bannerAction.onclick = async () => {
+            trackGoal('install_banner_action');
             if (this.deferredPrompt) {
                 await this.promptInstall();
             } else {
@@ -72,6 +81,7 @@ export class PWAInstall {
         };
 
         this.bannerNever.onclick = () => {
+            trackGoal('install_banner_never');
             try {
                 localStorage.setItem('fina_install_never', '1');
             } catch (e) { /* ignore */ }

@@ -1,3 +1,4 @@
+import { trackGoal } from '../helpers/analytics.js';
 export class Onboarding {
     constructor() {
         this.currentStep = 0;
@@ -79,11 +80,11 @@ export class Onboarding {
         document.body.appendChild(this.overlay);
 
         // Bind events
-        this.tooltip.querySelector('.onboarding-skip').onclick = () => this.finish();
-        this.tooltip.querySelector('.onboarding-prev').onclick = () => this.prev();
-        this.tooltip.querySelector('.onboarding-next').onclick = () => this.next();
+        this.tooltip.querySelector('.onboarding-skip').onclick = () => this.finish('skip');
+        this.tooltip.querySelector('.onboarding-prev').onclick = () => { trackGoal('onboarding_prev'); this.prev(); };
+        this.tooltip.querySelector('.onboarding-next').onclick = () => { trackGoal('onboarding_next'); this.next(); };
         this.overlay.onclick = (e) => {
-            if (e.target === this.overlay || e.target === this.spotlightSvg) this.finish();
+            if (e.target === this.overlay || e.target === this.spotlightSvg) this.finish('overlay');
         };
     }
 
@@ -169,7 +170,8 @@ export class Onboarding {
         }
     }
 
-    finish() {
+    finish(reason) {
+        trackGoal('onboarding_finish', { reason: reason || 'end' });
         this.overlay.classList.remove('active');
         setTimeout(() => {
             this.overlay.remove();

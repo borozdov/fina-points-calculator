@@ -360,7 +360,15 @@ body {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    /* На низких экранах содержимое выше формы. Обычный center выталкивал бы его
+       в обе стороны — поля наезжали на сегмент, результат вылезал из карточки.
+       safe center прижимает к началу, overflow оставляет прокрутку внутри. */
     justify-content: center;
+    justify-content: safe center;
+    overflow-y: auto;
+    /* Явно, а не по умолчанию: сам по себе overflow-y поднял бы overflow-x с visible
+       до auto, и любой вылет по горизонтали рисовался бы полосой прокрутки. */
+    overflow-x: hidden;
 }
 
 .form.hidden {
@@ -412,8 +420,8 @@ body {
 
 .tf input:focus {
     outline: none;
-    border-color: var(--border-strong);
-    box-shadow: 0 0 0 3px var(--ring);
+    border-color: var(--text);
+    box-shadow: inset 0 0 0 1px var(--text);
 }
 
 .sep {
@@ -422,6 +430,21 @@ body {
     font-family: var(--mono);
     color: var(--tertiary);
     padding-bottom: 8px;
+}
+
+/* Ниже 320px в строку не влезают ни «ОЧКИ → ВРЕМЯ», ни три поля времени.
+   Отыгрываем миллиметры на трекинге, боковых полях и зазоре — кегль не трогаем,
+   его читаемость здесь важнее воздуха. Блок стоит после .mode-seg .seg-btn и
+   .time-row: у медиазапроса та же специфичность, выигрывает он только порядком. */
+@media (max-width: 319px) {
+    .mode-seg .seg-btn {
+        letter-spacing: 0.04em;
+        padding: 9px 2px;
+    }
+
+    .time-row {
+        gap: 3px;
+    }
 }
 
 /* Quick input */
@@ -445,8 +468,8 @@ body {
 
 .quick:focus {
     outline: none;
-    border-color: var(--border-strong);
-    box-shadow: 0 0 0 3px var(--ring);
+    border-color: var(--text);
+    box-shadow: inset 0 0 0 1px var(--text);
 }
 
 /* Points input */
@@ -480,8 +503,8 @@ body {
 
 .pts-input:focus {
     outline: none;
-    border-color: var(--border-strong);
-    box-shadow: 0 0 0 3px var(--ring);
+    border-color: var(--text);
+    box-shadow: inset 0 0 0 1px var(--text);
 }
 
 /* ===== Result ===== */
@@ -763,104 +786,196 @@ body {
     display: none;
 }
 
-/* ===== Author exit ===== */
-.author-exit {
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    padding: 10px 12px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    text-decoration: none;
-    color: var(--soft);
-    transition: background var(--tr), color var(--tr), border-color var(--tr);
-}
-
-.author-exit-label {
-    font-size: 0.55rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: var(--slate);
-    transition: color var(--tr);
-}
-
-.author-exit-line {
-    font-size: 0.72rem;
-    line-height: 1.35;
-}
-
-.author-exit-cta {
-    font-family: var(--mono);
-    font-size: 0.62rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text);
-    transition: color var(--tr);
-}
-
-.author-exit:hover,
-.author-exit:focus-visible,
-.author-exit:active {
-    background: var(--text);
-    border-color: var(--text);
-    color: var(--canvas);
-}
-
-.author-exit:hover .author-exit-label,
-.author-exit:hover .author-exit-cta,
-.author-exit:focus-visible .author-exit-label,
-.author-exit:focus-visible .author-exit-cta,
-.author-exit:active .author-exit-label,
-.author-exit:active .author-exit-cta {
-    color: inherit;
-}
-
-@media (max-height: 640px) {
-    .author-exit {
-        padding: 7px 10px;
-        gap: 2px;
-    }
-}
-
-/* ===== Footer ===== */
+/* ===== Footer: авторство и точка выхода ===== */
 .footer {
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: 8px;
+    gap: 16px;
+    flex-wrap: nowrap;
+    padding-top: 10px;
     border-top: 1px solid var(--border);
-    font-size: 0.58rem;
+}
+
+/* Одна строка: заглавные, разреженно — лейбл */
+.author {
+    min-width: 0;
+    /* Гарантия от переполнения: лейбл уступает первым, кнопка не уезжает.
+       Многоточия нет намеренно — оно съедало как раз звание, ради которого
+       строка и существует. Вместо обрезки ступени ниже снимают куски целиком. */
+    display: flex;
+    align-items: baseline;
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 0.625rem;
     font-weight: 500;
-    text-transform: uppercase;
+    line-height: 1.4;
     letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--slate);
 }
 
-.footer a {
-    color: var(--slate);
-    text-decoration: none;
+/* Иерархия внутри строки — весом и тоном, без второй строки */
+.author b {
+    font-weight: 600;
+    color: var(--soft);
+}
+
+/* Куски строки — флекс-элементы, поэтому пробелы между ними задаёт CSS,
+   а не разметка: у флекс-элемента свои крайние пробелы схлопываются. */
+.author>* {
+    flex: none;
+}
+
+.author-prefix {
+    margin-right: 0.4em;
+}
+
+.author-sep {
+    margin: 0 0.4em;
+}
+
+/* Страховка помимо ступеней: сжиматься и обрезаться имеет право только имя.
+   Медиазапрос знает ширину экрана, но не ширину текста — если шрифт не
+   загрузился или у пользователя увеличен кегль, уступит имя, а звание
+   останется целым. */
+.author-name {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* Ступени лейбла. Порядок жертв: «СДЕЛАЛ» → полное звание → имя → фамилия.
+   Звание уходит последним и никогда полностью: ниже всех ступеней остаётся «МС».
+   Пороги подобраны замером, каждый на пиксель ниже той ширины, где вариант
+   ещё помещался целиком. */
+.author-rank-short {
+    display: none;
+}
+
+@media (max-width: 479px) {
+    .author-prefix {
+        display: none;
+    }
+}
+
+@media (max-width: 409px) {
+    .author-rank {
+        display: none;
+    }
+
+    .author-rank-short {
+        display: inline;
+    }
+}
+
+@media (max-width: 319px) {
+    .author-first {
+        display: none;
+    }
+}
+
+@media (max-width: 279px) {
+
+    .author-name,
+    .author-sep {
+        display: none;
+    }
+}
+
+/* Если в строку вернутся числа (дистанции, результат) — моноширинные, табличные */
+.author .num {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.06em;
+}
+
+/* Единственная точка выхода: плотная граница = «сюда можно нажать» */
+.author-link {
+    position: relative;
+    flex-shrink: 0;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    transition: color var(--tr);
-}
-
-.footer a:hover {
+    gap: 7px;
+    padding: 5px 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: 5px;
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--text);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background var(--tr), color var(--tr), border-color var(--tr);
 }
 
-.footer-links {
-    display: flex;
-    gap: 14px;
+/* Кнопка ниже 44px — растягиваем зону нажатия, не трогая рамку */
+.author-link::after {
+    content: '';
+    position: absolute;
+    inset: -9px;
 }
 
-@media (max-height: 640px) {
-    .footer {
-        display: none;
+/* Акцент только инверсией заливки */
+.author-link:hover {
+    background: var(--text);
+    color: var(--canvas);
+    border-color: var(--text);
+}
+
+.author-link:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+}
+
+.author-link .arrow {
+    transition: transform var(--tr);
+}
+
+.author-link:hover .arrow {
+    transform: translateX(2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .author-link,
+    .author-link .arrow {
+        transition: none;
+    }
+
+    .author-link:hover .arrow {
+        transform: none;
+    }
+}
+
+/* ===== Низкие экраны ===== */
+/* Телефон в альбомной ориентации, маленькое окно на десктопе: в экран всё уже
+   не влезает. Вместо того чтобы ужимать содержимое до нечитаемого, разрешаем
+   приложению прокручиваться — тем же приёмом, что и в режиме клавиатуры. */
+@media (max-height: 620px) {
+    .app {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .calc {
+        flex: 0 0 auto;
+    }
+
+    .form {
+        flex: 0 0 auto;
+        justify-content: flex-start;
+        /* Обе оси, не только вертикальная: рядом с overflow-x: hidden одиночный
+           overflow-y: visible вычислился бы в auto, и форма снова стала бы
+           скролл-контейнером — вместо прокрутки всего .app. */
+        overflow: visible;
+    }
+
+    .result {
+        flex: 0 0 auto;
+        min-height: 112px;
     }
 }
 
@@ -874,7 +989,6 @@ body {
 }
 
 .keyboard-open .history-section,
-.keyboard-open .author-exit,
 .keyboard-open .footer {
     display: none !important;
 }

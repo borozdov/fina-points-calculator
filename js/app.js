@@ -20,6 +20,10 @@ class App {
             favs: StorageManager.getFavs()
         };
 
+        // Восстановление из избранного кликает по кнопкам программно —
+        // такие клики целями не считаем
+        this._restoring = false;
+
         this.initDOM();
         this.bindEvents();
         this.initTheme();
@@ -38,6 +42,11 @@ class App {
     }
 
     $ = id => document.getElementById(id);
+
+    goal(name, params) {
+        if (this._restoring) return;
+        trackGoal(name, params);
+    }
 
     initDOM() {
         const get = id => this.$(id);
@@ -68,6 +77,7 @@ class App {
         this.shareTimeBtn = get('share-time');
         this.toastEl = get('toast');
         this.authorExit = get('author-exit');
+        this.qrBtn = get('qr-btn');
 
         this.themeToggle = get('theme-toggle');
         this.metaThemeColor = get('meta-theme-color');
@@ -77,17 +87,20 @@ class App {
         if (this.themeToggle) {
             this.themeToggle.onclick = () => {
                 const cur = document.documentElement.getAttribute('data-theme');
-                this.setTheme(cur === 'dark' ? 'light' : 'dark', true);
+                const next = cur === 'dark' ? 'light' : 'dark';
+                this.goal('theme_toggle', { lik: next });
+                this.setTheme(next, true);
             };
         }
 
         if (this.fTime) {
-            this.setupSeg('.row [aria-labelledby="pool-label"]', 'pool', v => { this.state.pool = v; this.fillEvents(); });
-            this.setupSeg('.row [aria-labelledby="gender-label"]', 'gender', v => { this.state.gender = v; this.fillEvents(); });
+            this.setupSeg('.row [aria-labelledby="pool-label"]', 'pool', v => { this.state.pool = v; this.fillEvents(); }, 'select_pool');
+            this.setupSeg('.row [aria-labelledby="gender-label"]', 'gender', v => { this.state.gender = v; this.fillEvents(); }, 'select_gender');
 
             document.querySelectorAll('.mode-seg .seg-btn').forEach(b => b.onclick = () => {
                 document.querySelectorAll('.mode-seg .seg-btn').forEach(x => { x.classList.remove('active'); x.setAttribute('aria-checked', 'false'); });
                 b.classList.add('active'); b.setAttribute('aria-checked', 'true');
+                this.goal('switch_mode', { mode: b.dataset.mode });
                 this.state.curMode = b.dataset.mode;
                 if (this.fTime) this.fTime.classList.toggle('hidden', this.state.curMode !== 'time');
                 if (this.fPts) this.fPts.classList.toggle('hidden', this.state.curMode !== 'points');
@@ -145,6 +158,7 @@ class App {
 
         if (this.$('clear-history')) {
             this.$('clear-history').onclick = () => {
+                this.goal('clear_favorites');
                 this.state.favs = [];
                 StorageManager.clearFavs();
                 this.renderFavs();
@@ -152,16 +166,21 @@ class App {
         }
 
         if (this.favToggle) {
-            this.favToggle.onclick = () => this.historySection && this.historySection.classList.toggle('collapsed');
+            this.favToggle.onclick = () => {
+                this.goal('toggle_favorites');
+                if (this.historySection) this.historySection.classList.toggle('collapsed');
+            };
             this.favToggle.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') this.favToggle.click(); };
         }
 
         if (this.sharePtsBtn) this.sharePtsBtn.onclick = () => this.shareResult('pts');
         if (this.shareTimeBtn) this.shareTimeBtn.onclick = () => this.shareResult('time');
 
+        if (this.qrBtn) this.qrBtn.onclick = () => this.goal('open_qr');
+
         if (this.authorExit) {
             this.authorExit.onclick = async (e) => {
-                trackGoal('to_site');
+                this.goal('to_site');
                 const url = this.authorExit.href;
                 const Browser = window.Capacitor?.Plugins?.Browser;
                 if (!Browser?.open) return;
@@ -201,10 +220,11 @@ class App {
         return value.replace(/\D/g, '').slice(0, 4);
     }
 
-    setupSeg(sel, attr, cb) {
+    setupSeg(sel, attr, cb, goalName) {
         document.querySelectorAll(`${sel} .seg-btn`).forEach(b => b.onclick = () => {
             document.querySelectorAll(`${sel} .seg-btn`).forEach(x => { x.classList.remove('active'); x.setAttribute('aria-checked', 'false'); });
             b.classList.add('active'); b.setAttribute('aria-checked', 'true');
+            if (goalName) this.goal(goalName, { [attr]: b.dataset[attr] });
             cb(b.dataset[attr]);
         });
     }
@@ -383,6 +403,7 @@ class App {
             c.setAttribute('aria-checked', s === this.state.curStyle ? 'true' : 'false');
             c.onclick = () => {
                 if (this.state.curStyle === s) return;
+                this.goal('select_style', { style: s });
                 this.state.curStyle = s;
 
                 let newEvent = '';
@@ -414,6 +435,7 @@ class App {
             c.setAttribute('role', 'radio');
             c.setAttribute('aria-checked', k === this.state.curEvent ? 'true' : 'false');
             c.onclick = () => {
+                this.goal('select_event', { event: k });
                 this.state.curEvent = k;
                 this.grid.querySelectorAll('.chip').forEach(x => { x.classList.remove('active'); x.setAttribute('aria-checked', 'false'); });
                 c.classList.add('active'); c.setAttribute('aria-checked', 'true');
@@ -484,7 +506,10 @@ class App {
 
             if (h.raw) {
                 div.style.cursor = 'pointer';
-                div.onclick = () => this.loadState(h.raw);
+                div.onclick = () => {
+                    this.goal('restore_favorite');
+                    this.loadState(h.raw);
+                };
             }
 
             // Старые записи могли сохраняться с эмодзи-префиксом — убираем его при выводе
@@ -495,6 +520,7 @@ class App {
 
         document.querySelectorAll('.hi-del').forEach(btn => btn.onclick = (e) => {
             e.stopPropagation();
+            this.goal('delete_favorite');
             this.state.favs = this.state.favs.filter(x => x.id !== +btn.dataset.id);
             StorageManager.saveFavs(this.state.favs);
             this.renderFavs();
@@ -505,9 +531,11 @@ class App {
     loadState(raw) {
         if (!raw) return;
 
+        this._restoring = true;
         document.querySelector(`[data-pool="${raw.pool}"]`)?.click();
         document.querySelector(`[data-gender="${raw.gender}"]`)?.click();
         document.querySelector(`.mode-seg .seg-btn[data-mode="${raw.mode}"]`)?.click();
+        this._restoring = false;
 
         this.state.curEvent = raw.eventKey;
         if (this.state.curEvent) {
