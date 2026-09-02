@@ -168,7 +168,9 @@ class App {
         if (this.favToggle) {
             this.favToggle.onclick = () => {
                 this.goal('toggle_favorites');
-                if (this.historySection) this.historySection.classList.toggle('collapsed');
+                if (!this.historySection) return;
+                const collapsed = this.historySection.classList.toggle('collapsed');
+                this.favToggle.setAttribute('aria-expanded', String(!collapsed));
             };
             this.favToggle.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') this.favToggle.click(); };
         }

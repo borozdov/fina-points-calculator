@@ -697,22 +697,50 @@ body {
     color: var(--text);
 }
 
+/* Штора. Анимируется grid-трек, а не max-height: трек знает настоящую высоту
+   списка, поэтому движение идёт всю дорогу. С max-height: 150px при одной
+   записи (~32px) высота — это min(содержимое, max-height), и первые 80%
+   времени не двигалось ничего, а потом список схлопывался рывком.
+   align-items: start — чтобы список держал свою высоту и уезжал под штору
+   целиком, а не сжимался сам (иначе на середине выскакивал скроллбар). */
+.history-collapse {
+    display: grid;
+    /* minmax(0, …) снимает автоминимум fr-трека: он равен min-content содержимого,
+       а при box-sizing: border-box рамка списка не ужимается ниже своих 2px —
+       без этого штора закрывалась не в ноль, а в полоску. */
+    grid-template-rows: minmax(0, 1fr);
+    align-items: start;
+    overflow: hidden;
+    /* ease-in-out, а не ease: интерполяция fr нелинейна по пикселям, и с обычным
+       ease список пролетал 60% пути за первую четверть времени, а потом полз.
+       Замер высоты по кадрам: ease давал 100-86-59-35-20-10-4-1-0,
+       ease-in-out даёт 100-97-87-71-50-29-13-3-0 — ровная симметричная дуга. */
+    transition: grid-template-rows 0.28s ease-in-out, opacity 0.28s ease-in-out;
+}
+
+.history-section.collapsed .history-collapse {
+    grid-template-rows: minmax(0, 0fr);
+    opacity: 0;
+}
+
+/* Рамка на списке, а не на шторе: тогда штора закрывается ровно в ноль,
+   а рамка уезжает вместе с содержимым — вместо прежнего border: none,
+   который не был в transition и просто мигал. */
 .history-list {
     display: flex;
     flex-direction: column;
+    min-height: 0;
     max-height: 150px;
     overflow-y: auto;
     border: 1px solid var(--border);
     border-radius: 6px;
     background: var(--surface);
-    transition: max-height 0.3s ease, opacity 0.3s ease;
 }
 
-.history-section.collapsed .history-list {
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    border: none;
+@media (prefers-reduced-motion: reduce) {
+    .history-collapse {
+        transition: none;
+    }
 }
 
 .history-item {

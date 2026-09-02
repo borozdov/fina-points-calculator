@@ -401,11 +401,13 @@
         <!-- Favorites -->
         <div class="history-section" id="history-section">
             <div class="history-header">
-                <span class="label" id="fav-toggle" tabindex="0" role="button"
-                    title="Свернуть/Развернуть">Избранное</span>
+                <span class="label" id="fav-toggle" tabindex="0" role="button" aria-expanded="true"
+                    aria-controls="history-list" title="Свернуть/Развернуть">Избранное</span>
                 <button type="button" class="clear-btn" id="clear-history" aria-label="Очистить всё">Очистить</button>
             </div>
-            <div class="history-list" id="history-list"></div>
+            <div class="history-collapse">
+                <div class="history-list" id="history-list"></div>
+            </div>
         </div>
 
         <!-- Footer -->
