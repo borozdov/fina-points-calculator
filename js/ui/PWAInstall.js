@@ -36,6 +36,17 @@ export class PWAInstall {
             this.deferredPrompt = e;
         });
 
+        // Установить приложение можно и мимо нашего UI — через меню браузера.
+        // Без этого обработчика кнопка и баннер продолжали висеть в открытой
+        // вкладке до перезагрузки, предлагая установить уже установленное.
+        window.addEventListener('appinstalled', () => {
+            this.deferredPrompt = null;
+            trackGoal('pwa_installed');
+            this.hideInstallUi();
+            this.hideModal();
+            this.hideBanner();
+        });
+
         this.installBtn.onclick = () => {
             trackGoal('install_open');
             if (this.isIOS()) {

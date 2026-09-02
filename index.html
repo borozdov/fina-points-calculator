@@ -49,6 +49,28 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="FINA Calc">
+    <meta name="application-name" content="FINA Calc">
+    <!-- Без этого системные виджеты (скроллбары, автозаполнение) рисуются
+         светлыми поверх обсидиана -->
+    <meta name="color-scheme" content="dark light">
+    <!-- Результат и время — цифры; iOS принимал их за телефонные номера -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-TileColor" content="#0d0d0d">
+    <meta name="msapplication-TileImage" content="assets/img/icon-192.png">
+
+    <!-- Стартовые экраны iOS: без них standalone-запуск показывал белый экран.
+         Файлы читает система при запуске с домашнего экрана, поэтому в предкэш
+         service worker они не добавлены. -->
+    <link rel="apple-touch-startup-image" href="assets/splash/splash-1290x2796.png"
+        media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="assets/splash/splash-1179x2556.png"
+        media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="assets/splash/splash-1125x2436.png"
+        media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="assets/splash/splash-828x1792.png"
+        media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="assets/splash/splash-750x1334.png"
+        media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
 
     <!-- Structured Data (Schema.org) -->
     <script type="application/ld+json">
@@ -96,11 +118,10 @@
     <!-- Preconnect for analytics -->
     <link rel="preconnect" href="https://mc.yandex.ru">
 
-    <!-- Fonts: Inter + JetBrains Mono, оффлайн — системный стек -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap">
+    <!-- Fonts: свои .woff2, @font-face в css/style.css. Предзагружаем латиницу и
+         кириллицу — их требует первый экран, остальное подтянется по мере надобности. -->
+    <link rel="preload" href="assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/fonts/inter-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
 
     <!-- Theme init (prevent flash) -->
     <script>
@@ -114,6 +135,10 @@
                     ? stored
                     : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
                 document.documentElement.setAttribute('data-theme', theme);
+                // Красим системную плашку сразу, а не после загрузки модуля:
+                // иначе у светлого пользователя первый кадр всегда обсидиановый
+                var mt = document.getElementById('meta-theme-color');
+                if (mt) mt.content = theme === 'light' ? '#fafafa' : '#0d0d0d';
             } catch (e) { }
         })();
     </script>

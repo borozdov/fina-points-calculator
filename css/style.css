@@ -4,6 +4,48 @@
    Инверсия — единственный акцент. Линии вместо теней.
    ============================================================ */
 
+/* ===== Fonts (self-hosted, OFL) =====
+   Вариативные Inter и JetBrains Mono, подмножества latin + cyrillic.
+   Локально, а не с Google Fonts: приложение офлайновое, а SW чужие origin
+   не кэширует — офлайн типографика слетала на системный шрифт, и табличные
+   цифры результата разъезжались по ширине. Заодно уходит рендер-блокирующий
+   запрос к чужому домену и утечка IP пользователей в Google. */
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('../assets/fonts/inter-cyrillic.woff2') format('woff2');
+    unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('../assets/fonts/inter-latin.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('../assets/fonts/jetbrains-mono-cyrillic.woff2') format('woff2');
+    unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('../assets/fonts/jetbrains-mono-latin.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 /* ===== Tokens ===== */
 :root {
     --font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -53,6 +95,24 @@
     margin: 0;
     padding: 0;
     -webkit-tap-highlight-color: transparent;
+    /* Выделять нечего: это калькулятор, а не текст. Долгий тап по кнопке давал
+       лупу выделения вместо нажатия, двойной — выделял слово в сегменте.
+       Поля ввода исключены ниже. Префикс обязателен: Safari до 16 без него
+       свойство не понимает. */
+    -webkit-user-select: none;
+    user-select: none;
+    /* Убирает контекстное меню iOS по долгому тапу */
+    -webkit-touch-callout: none;
+}
+
+/* Единственное исключение — поля ввода: без этого на iOS ломается выделение
+   и вставка. Список полный: три поля времени, быстрый ввод и поле очков. */
+.tf input,
+.quick,
+.pts-input {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
 }
 
 html,
@@ -70,6 +130,9 @@ body {
     line-height: 1.4;
     overflow: hidden;
     -webkit-font-smoothing: antialiased;
+    /* Снимает зум по двойному тапу и заодно 300-мс задержку клика.
+       Пинч-зум запрещён отдельно, в viewport. */
+    touch-action: manipulation;
 }
 
 /* Смена лика мгновенна */
@@ -450,8 +513,12 @@ body {
 /* Quick input */
 .quick {
     width: 100%;
-    padding: 9px 12px;
-    font-size: 0.88rem;
+    padding: 9px 10px;
+    /* Ровно 1rem = 16px и ни пикселем меньше: iOS Safari игнорирует
+       user-scalable=no и при фокусе зумит любое поле мельче 16px, после чего
+       вёрстка уезжает и обратно не возвращается. Это было единственное такое
+       поле. Боковые поля ужаты, чтобы длинный плейсхолдер остался целым. */
+    font-size: 1rem;
     font-family: var(--mono);
     color: var(--text);
     background: var(--inset);
@@ -762,7 +829,6 @@ body {
     font-size: 0.75rem;
     color: var(--slate);
     transition: background var(--tr);
-    user-select: none;
 }
 
 .history-item + .history-item {

@@ -30,6 +30,7 @@ class App {
         this.initKeyboardMode();
         this.renderFavs();
         this.fillEvents();
+        this.applyModeFromUrl();
 
         const pwa = new PWAInstall();
         pwa.init();
@@ -42,6 +43,22 @@ class App {
     }
 
     $ = id => document.getElementById(id);
+
+    // Ярлыки манифеста ведут на /?mode=time и /?mode=points. Раньше параметр никто
+    // не читал, и оба ярлыка открывали режим «Время → Очки» — то есть ярлык
+    // «Очки → Время» обещал то, чего не делал.
+    // Жмём кнопку программно, а не правим state напрямую: у сегмента на клике
+    // висит переключение форм и подсветка активного. Флаг _restoring гасит цель
+    // Метрики — это не выбор пользователя.
+    applyModeFromUrl() {
+        const mode = new URLSearchParams(location.search).get('mode');
+        if (mode !== 'time' && mode !== 'points') return;
+        if (mode === this.state.curMode) return;
+
+        this._restoring = true;
+        document.querySelector(`.mode-seg .seg-btn[data-mode="${mode}"]`)?.click();
+        this._restoring = false;
+    }
 
     goal(name, params) {
         if (this._restoring) return;

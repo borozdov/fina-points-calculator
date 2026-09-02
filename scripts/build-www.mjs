@@ -6,11 +6,18 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const webDir = path.join(root, 'www');
 
 const entries = [
+    // Только img и fonts: без шрифтов предкэш service worker падал бы на
+    // отсутствующем файле. assets/screenshots и assets/splash — витрина установки
+    // PWA и стартовые экраны iOS, внутри Android-пакета это мёртвый груз.
     'assets/img',
+    'assets/fonts',
     'css',
     'index.html',
     'js',
     'manifest.json',
+    // qr нужен и в нативной сборке: кнопка QR в шапке ведёт на /qr/, а без
+    // копирования она упиралась в 404 прямо внутри приложения
+    'qr',
     'robots.txt',
     'sitemap.xml',
     'sw.js'
@@ -40,7 +47,5 @@ for (const entry of entries) {
     await mkdir(path.dirname(destination), { recursive: true });
     await cp(path.join(root, entry), destination, { recursive: true });
 }
-
-await rm(path.join(webDir, 'js/lib/qrcode.min.js'), { force: true });
 
 console.log(`Prepared Capacitor web assets in ${webDir}`);
