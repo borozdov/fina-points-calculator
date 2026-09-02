@@ -654,6 +654,15 @@ body {
     align-items: center;
     justify-content: space-between;
     margin-bottom: 5px;
+    transition: margin-bottom 0.28s ease-in-out;
+}
+
+/* Свёрнутый вид: зазор до списка больше нечего отделять, и без его снятия
+   строка висела не по центру — 9px сверху против 13px снизу (5px здесь плюс
+   8px зазора .app). Убираем — получается 9/8, то есть середина. Переход
+   тот же, что у шторы, иначе зазор схлопывался бы скачком. */
+.history-section.collapsed .history-header {
+    margin-bottom: 0;
 }
 
 .history-header .label {
@@ -738,7 +747,9 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .history-collapse {
+
+    .history-collapse,
+    .history-header {
         transition: none;
     }
 }
