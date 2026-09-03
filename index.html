@@ -6,6 +6,11 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
 
+    <!-- Without this, any URL that isn't "/" (e.g. an unknown path the server
+         falls back to index.html for) resolves every relative asset path
+         against that URL instead of the site root, breaking module scripts. -->
+    <base href="/">
+
     <!-- SEO -->
     <title>Калькулятор очков FINA — очки FINA онлайн, расчёт баллов по плаванию | Borozdov</title>
     <meta name="description"
