@@ -1,9 +1,10 @@
-const CACHE_NAME = 'fina-calc-v24';
+const CACHE_NAME = 'fina-calc-v25';
 
 // Всё, что нужно приложению офлайн. Список заодно служит белым списком для
 // runtime-кэша (см. isCacheable) — иначе кэш растёт бесконтрольно.
 const ASSETS_TO_CACHE = [
     '/',
+    '/favicon.ico',
     '/css/style.css',
     '/js/app.js',
     '/js/data/constants.js',

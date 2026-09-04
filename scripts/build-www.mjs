@@ -12,6 +12,7 @@ const entries = [
     'assets/img',
     'assets/fonts',
     'css',
+    'favicon.ico',
     'index.html',
     'js',
     'manifest.json',
