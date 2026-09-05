@@ -1,4 +1,6 @@
-import { access, cp, mkdir, rm } from 'node:fs/promises';
+import { access, cp, mkdir, rm, writeFile } from 'node:fs/promises';
+
+import { BT } from '../js/data/constants.js';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -21,7 +23,11 @@ const entries = [
     'qr',
     'robots.txt',
     'sitemap.xml',
-    'sw.js'
+    'sw.js',
+    // Статические страницы, собранные scripts/build-pages.mjs
+    'bazovye-vremena',
+    'ochki-i-razryady',
+    'tablica-ochkov'
 ];
 
 // Сначала проверяем, потом удаляем. www/ сносится целиком, поэтому падение на середине
@@ -48,5 +54,17 @@ for (const entry of entries) {
     await mkdir(path.dirname(destination), { recursive: true });
     await cp(path.join(root, entry), destination, { recursive: true });
 }
+
+/*
+  Виджет на домашнем экране читает базовые времена из ассетов пакета:
+  FinaWidgetProvider.java → getAssets().open("public/data/fina_base_times.json").
+  Раньше этот файл лежал в репозитории отдельной копией BT и был удалён; виджет с тех пор
+  работает только на несинхронизированном снимке в android/, и первый же `cap sync` его
+  затрёт. Отдаём JSON здесь, из тех же данных, что и веб: две копии одних чисел разъезжаются,
+  одна — нет. Ошибка при этом молчаливая: getBaseTime вернул бы 0, список событий стал бы
+  пустым, и виджет показал бы нули без единого сообщения.
+*/
+await mkdir(path.join(webDir, 'data'), { recursive: true });
+await writeFile(path.join(webDir, 'data/fina_base_times.json'), `${JSON.stringify(BT, null, 4)}\n`);
 
 console.log(`Prepared Capacitor web assets in ${webDir}`);

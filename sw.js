@@ -28,16 +28,24 @@ const ASSETS_TO_CACHE = [
     '/assets/img/icon-maskable-512.png',
     '/assets/img/apple-touch-icon.png',
     '/qr/',
+    '/css/pages.css',
+    '/bazovye-vremena/',
+    '/ochki-i-razryady/',
+    '/tablica-ochkov/',
     '/js/lib/qrcode.min.js'
 ];
 
 const PRECACHED = new Set(ASSETS_TO_CACHE);
 
+// Тридцать пять таблиц по дистанциям: держим ту, что открыли, но в предкэш их не кладём —
+// оболочка приложения не должна раздуваться до всего сайта.
+const TABLES_PREFIX = '/tablica-ochkov/';
+
 // В кэш кладём только известные пути. Причина конкретная: сервер на любой
 // неизвестный адрес отдаёт index.html со статусом 200, и без этой проверки
 // каждый мусорный URL оседал бы в кэше отдельной копией страницы.
 function isCacheable(url) {
-    return PRECACHED.has(url.pathname);
+    return PRECACHED.has(url.pathname) || url.pathname.startsWith(TABLES_PREFIX);
 }
 
 self.addEventListener('install', (event) => {

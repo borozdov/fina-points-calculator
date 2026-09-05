@@ -6,7 +6,8 @@
   "description": "FINA Points Calculator Android wrapper",
   "scripts": {
     "check": "node scripts/check-basetimes.mjs",
-    "build:web": "npm run check && node scripts/build-www.mjs",
+    "build:pages": "node scripts/build-pages.mjs",
+    "build:web": "npm run check && npm run build:pages && node scripts/build-www.mjs",
     "cap:sync": "npm run build:web && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home ANDROID_HOME=/opt/homebrew/share/android-commandlinetools ANDROID_SDK_ROOT=/opt/homebrew/share/android-commandlinetools npx cap sync android",
     "android:debug": "npm run cap:sync && cd android && JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home ANDROID_HOME=/opt/homebrew/share/android-commandlinetools ANDROID_SDK_ROOT=/opt/homebrew/share/android-commandlinetools ./gradlew assembleDebug",
     "apk:debug": "npm run android:debug && cp android/app/build/outputs/apk/debug/app-debug.apk fina-points-debug.apk",

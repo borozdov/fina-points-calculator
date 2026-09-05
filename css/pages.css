@@ -1,0 +1,174 @@
+/*
+  Стили статических страниц. Собирается scripts/build-pages.mjs — правьте генератор, не этот файл.
+  Токены лика и @font-face вырезаны из css/style.css, чтобы цвет и шрифт были одни на весь сайт.
+*/
+:root {
+    --font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --mono: 'JetBrains Mono', 'Berkeley Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    --tr: 0.15s ease;
+}
+
+[data-theme="dark"] {
+    --canvas: #0d0d0d;
+    --inset: #121212;
+    --surface: #1a1a1a;
+    --hov: #212121;
+    --zebra: #161616;
+    --border: #2e2e2e;
+    --border-strong: #6b6b6b;
+    --slate: #8a8a8a;
+    --tertiary: #6b6b6b;
+    --soft: #d1d1d1;
+    --text: #fafafa;
+    --ring: rgba(250, 250, 250, 0.22);
+    --scrim: rgba(0, 0, 0, 0.7);
+}
+
+[data-theme="light"] {
+    --canvas: #fafafa;
+    --inset: #ececec;
+    --surface: #ffffff;
+    --hov: #f2f2f2;
+    --zebra: #f6f6f6;
+    --border: #e4e4e4;
+    --border-strong: #8a8a8a;
+    --slate: #6b6b6b;
+    --tertiary: #8a8a8a;
+    --soft: #3d3d3d;
+    --text: #0d0d0d;
+    --ring: rgba(13, 13, 13, 0.22);
+    --scrim: rgba(13, 13, 13, 0.45);
+}
+
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('../assets/fonts/inter-cyrillic.woff2') format('woff2');
+    unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('../assets/fonts/inter-latin.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('../assets/fonts/jetbrains-mono-cyrillic.woff2') format('woff2');
+    unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('../assets/fonts/jetbrains-mono-latin.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+    margin: 0;
+    background: var(--canvas);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: max(10px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 40px max(14px, env(safe-area-inset-left));
+}
+
+.head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+}
+
+.logo { display: flex; flex-direction: column; line-height: 1; text-decoration: none; }
+.logo-top { font-size: 1.05rem; font-weight: 600; text-transform: uppercase; letter-spacing: -0.02em; color: var(--text); }
+.logo-bottom { margin-top: 3px; font-size: 0.55rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: var(--slate); }
+
+.calc-link {
+    padding: 7px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 0.75rem;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.calc-link:hover { border-color: var(--border-strong); }
+
+.crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 14px 0 10px;
+    color: var(--slate);
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+}
+
+.crumbs a { color: var(--slate); text-decoration: none; }
+.crumbs a:hover { color: var(--text); }
+.crumbs .sep { color: var(--border); }
+
+h1 { margin: 0 0 12px; font-size: 1.125rem; font-weight: 600; line-height: 1.2; text-transform: uppercase; letter-spacing: -0.02em; }
+h2 { margin: 26px 0 8px; font-size: 0.62rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: var(--slate); }
+
+p { margin: 0 0 10px; }
+.lead { color: var(--text); }
+.note { color: var(--slate); font-size: 0.8125rem; }
+
+code { font-family: var(--mono); font-size: 0.9em; white-space: nowrap; }
+
+a { color: var(--text); text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 3px; }
+a:hover { text-decoration-color: var(--text); }
+
+/* Таблица шире экрана прокручивается внутри себя, а не тащит за собой страницу. */
+.scroll { overflow-x: auto; margin: 0 0 6px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+th, td { padding: 7px 10px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
+thead th { color: var(--slate); font-size: 0.62rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; }
+tbody th { font-weight: 400; }
+/* Заголовок встаёт над своей колонкой: числа прижаты вправо, значит и подпись тоже. */
+th:not(:first-child), td { text-align: right; }
+
+/* Любое число моноширинное и с табличными цифрами: колонки обязаны стоять столбиком. */
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+.links { margin: 0; padding: 0; list-style: none; columns: 2; }
+.links li { margin-bottom: 5px; break-inside: avoid; }
+
+.foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 32px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    color: var(--slate);
+    font-size: 0.7rem;
+}
