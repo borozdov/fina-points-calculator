@@ -733,24 +733,6 @@ body {
     display: inline-flex;
 }
 
-/* Внутри плашки лежит ссылка на razryad.borozdov.ru: цвет и вес наследуются у плашки,
-   подчёркивание пунктиром — единственное, чем она себя обозначает. */
-.rank-badge a {
-    color: inherit;
-    font: inherit;
-    letter-spacing: inherit;
-    text-decoration: underline dotted;
-    text-underline-offset: 2px;
-    /* Плашка мелкая: расширяем зону нажатия, не трогая вёрстку. */
-    position: relative;
-}
-
-.rank-badge a::after {
-    content: '';
-    position: absolute;
-    inset: -10px;
-}
-
 /* ===== Favorites ===== */
 .history-section {
     flex-shrink: 0;

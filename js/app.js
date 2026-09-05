@@ -1,5 +1,5 @@
 import { BT, RU, STYLE_ORDER, STYLE_RU } from './data/constants.js';
-import { fmt, parseT, parseEventInfo, rankSiteUrl, resultFromQuery, resultQuery } from './helpers/utils.js';
+import { fmt, parseT, parseEventInfo, resultFromQuery, resultQuery } from './helpers/utils.js';
 import { Calculator } from './core/Calculator.js';
 import { StorageManager } from './core/Storage.js';
 import { ShareManager } from './ui/Share.js';
@@ -497,19 +497,11 @@ class App {
         this.updateBaseTime();
     }
 
-    /*
-      Плашка разряда — ссылка на ту же дистанцию на razryad.borozdov.ru. Нормативы там
-      живут полностью, здесь они только подпись под очками. shareResult читает textContent,
-      и внутри ссылки он остаётся тем же самым.
-    */
+    // Плашка разряда — подпись под очками, и только: нормативы живут на
+    // razryad.borozdov.ru, но никуда отсюда не ведут.
     showRank(node, rank) {
         if (!node) return;
-        const url = rank ? rankSiteUrl(this.state.pool, this.state.curEvent) : null;
-        if (rank && url) {
-            node.innerHTML = `<a href="${url}" rel="noopener">${rank}</a>`;
-        } else {
-            node.textContent = rank;
-        }
+        node.textContent = rank;
         node.classList.toggle('show', !!rank);
     }
 

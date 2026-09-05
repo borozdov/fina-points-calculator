@@ -35,15 +35,7 @@ export function parseT(s) {
     return NaN;
 }
 
-/*
-  Адрес страницы этой же дистанции на razryad.borozdov.ru.
-
-  Нормативы ЕВСК есть у обоих сайтов, и это дубль. Вместо того чтобы делить между ними
-  одну выдачу, плашка разряда ведёт туда: таблицы, страницы дистанций и всё со словами
-  «разряд» и «норматив» — там, очки — здесь. Дубль превращается в перелинковку.
-
-  Наборы событий у двух сайтов совпадают: оба идут от приказа № 1092.
-*/
+/* Слаги стилей: тот же словарь, что у адресов страниц и у ссылки на результат. */
 const RANK_STROKE = {
     Freestyle: 'free',
     Backstroke: 'back',
@@ -53,13 +45,6 @@ const RANK_STROKE = {
 };
 
 const STROKE_BY_SLUG = Object.fromEntries(Object.entries(RANK_STROKE).map(([k, v]) => [v, k]));
-
-export function rankSiteUrl(pool, eventKey) {
-    const m = String(eventKey || '').match(/^(\d+)m (.*)$/);
-    const stroke = m && RANK_STROKE[m[2]];
-    if (!stroke) return null;
-    return `https://razryad.borozdov.ru/normativy/${pool.toLowerCase()}/${stroke}/${m[1]}/`;
-}
 
 /*
   Результат как адрес.
