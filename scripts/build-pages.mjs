@@ -111,6 +111,7 @@ const page = ({ path, title, description, heading, crumbs, body }) => {
     <meta property="og:site_name" content="FINA Points Borozdov">
 
     <link rel="icon" href="/favicon.ico" sizes="32x32">
+    <link rel="icon" href="assets/img/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
     <meta name="theme-color" id="meta-theme-color" content="#0d0d0d">
     <meta name="color-scheme" content="dark light">
