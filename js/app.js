@@ -196,6 +196,11 @@ class App {
 
         if (this.qrBtn) this.qrBtn.onclick = () => this.goal('open_qr');
 
+        // Логотип перезагружает страницу. Раньше это был <a href="#"> с инлайновым
+        // обработчиком: ссылка в никуда для краулера и мина под любой строгий CSP.
+        const logo = document.getElementById('logo-reload');
+        if (logo) logo.onclick = () => location.reload();
+
         if (this.authorExit) {
             this.authorExit.onclick = async (e) => {
                 this.goal('to_site');

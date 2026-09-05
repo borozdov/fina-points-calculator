@@ -128,7 +128,13 @@ body {
     background: var(--canvas);
     color: var(--text);
     line-height: 1.4;
-    overflow: hidden;
+    /*
+      Прокрутка по вертикали разрешена, и только ради текста под калькулятором: сам
+      калькулятор по-прежнему ровно 100dvh и на первом экране выглядит как раньше.
+      Без прокрутки странице нечего показать поиску, кроме подписей контролов.
+    */
+    overflow-x: hidden;
+    overscroll-behavior-y: none;
     -webkit-font-smoothing: antialiased;
     /* Снимает зум по двойному тапу и заодно 300-мс задержку клика.
        Пинч-зум запрещён отдельно, в viewport. */
@@ -204,8 +210,17 @@ body {
 .logo {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     text-decoration: none;
     line-height: 1;
+    /* Это <button>, а не ссылка: он перезагружает страницу, никуда не ведёт. */
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    text-align: left;
 }
 
 .logo-top {
@@ -276,6 +291,21 @@ body {
 }
 
 /* ===== Labels ===== */
+/*
+  Единственный h1 страницы. Кегль подписи, а не заголовка: экран у калькулятора один,
+  и строка обязана поместиться в него, не сдвинув ни одного контрола.
+*/
+.page-title {
+    flex-shrink: 0;
+    margin: 0;
+    font-size: 0.62rem;
+    font-weight: 500;
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--slate);
+}
+
 .label {
     display: block;
     font-size: 0.62rem;
@@ -1683,4 +1713,58 @@ body {
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
     }
+}
+
+/* ===== Текст под калькулятором =====
+   Начинается ровно на сгибе: .app занимает 100dvh, эта секция идёт следом в обычном
+   потоке. Колонка та же, что у приложения, чтобы страница читалась как одна вещь. */
+.about {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 4px max(14px, env(safe-area-inset-right)) 40px max(14px, env(safe-area-inset-left));
+    border-top: 1px solid var(--border);
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: var(--text);
+}
+
+.about h2 {
+    margin: 28px 0 8px;
+    font-size: 0.62rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--slate);
+}
+
+.about h2:first-child {
+    margin-top: 24px;
+}
+
+.about p {
+    margin: 0 0 10px;
+}
+
+.about b {
+    font-weight: 600;
+}
+
+.about code {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.9em;
+    white-space: nowrap;
+}
+
+.about a {
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-color: var(--border);
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.15s ease;
+}
+
+.about a:hover {
+    text-decoration-color: var(--text);
 }

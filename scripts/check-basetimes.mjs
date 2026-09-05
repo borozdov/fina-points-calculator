@@ -27,6 +27,15 @@ const readEditions = async () => {
   return editions;
 };
 
+/** Текст под калькулятором называет редакцию вслух. Проверяем, что он не разошёлся с данными. */
+const checkPage = async (editions) => {
+  const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
+  const missing = Object.values(editions)
+    .map(({ edition }) => edition)
+    .filter((edition) => !html.includes(edition));
+  return missing;
+};
+
 const today = new Date().toISOString().slice(0, 10);
 const editions = await readEditions();
 
@@ -46,4 +55,14 @@ if (expired) {
   process.exit(1);
 }
 
-console.log(`\nПроверено на ${today}.`);
+const missing = await checkPage(editions);
+if (missing.length > 0) {
+  console.error(
+    `\nindex.html не называет редакцию: ${missing.join(', ')}.\n` +
+      'Текст под калькулятором обещает читателю, по какой таблице он считает, ' +
+      'и это обещание должно совпадать с данными.',
+  );
+  process.exit(1);
+}
+
+console.log(`\nПроверено на ${today}: редакции действуют и названы на странице.`);

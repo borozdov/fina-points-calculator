@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
 
     <!-- Without this, any URL that isn't "/" (e.g. an unknown path the server
          falls back to index.html for) resolves every relative asset path
@@ -45,6 +45,7 @@
     <meta name="twitter:image" content="https://fina.borozdov.ru/assets/img/icon-512.png">
 
     <!-- PWA & Icons -->
+    <link rel="icon" href="favicon.ico" sizes="48x48">
     <link rel="icon" href="assets/img/favicon.png" type="image/png">
     <link rel="icon" href="assets/img/icon-192.png" type="image/png" sizes="192x192">
     <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
@@ -247,7 +248,7 @@
 
     <noscript>
         <div style="text-align:center;padding:40px 20px;font-family:system-ui,sans-serif;">
-            <h1>FINA POINTS</h1>
+            <p style="font-weight:600;letter-spacing:.08em;">FINA POINTS</p>
             <p style="margin-top:12px;color:#8a8a8a;">Для работы калькулятора необходимо включить JavaScript в настройках
                 браузера.</p>
         </div>
@@ -257,10 +258,10 @@
         <!-- Header -->
         <div class="header-row">
             <div>
-                <a href="#" onclick="location.reload(); return false;" class="logo" aria-label="FINA Points by Borozdov">
+                <button type="button" class="logo" id="logo-reload" aria-label="FINA Points by Borozdov, обновить">
                     <span class="logo-top">FINA POINTS</span>
                     <span class="logo-bottom">BY BOROZDOV</span>
-                </a>
+                </button>
             </div>
             <div class="header-actions">
                 <a href="/qr/" class="icon-btn" id="qr-btn" aria-label="QR-код — поделиться приложением"
@@ -310,6 +311,8 @@
                 </button>
             </div>
         </div>
+
+        <h1 class="page-title">Калькулятор очков FINA</h1>
 
         <!-- Pool + Gender -->
         <div class="row">
@@ -365,7 +368,8 @@
                     <div class="tf"><label for="t-h">сот</label><input type="text" id="t-h" maxlength="2"
                             placeholder="00" inputmode="numeric" enterkeyhint="done"></div>
                 </div>
-                <input type="text" id="t-quick" class="quick" placeholder="или: 1:05.32 / 65.32 / 10532"
+                <input type="text" id="t-quick" class="quick" aria-label="Время одной строкой"
+                    placeholder="или: 1:05.32 / 65.32 / 10532"
                     inputmode="decimal" pattern="[0-9:.,]*" enterkeyhint="done">
                 <div class="result" id="r-pts" aria-live="polite">
                     <span class="rank-badge" id="r-pts-rank"></span>
@@ -447,6 +451,51 @@
             </a>
         </footer>
     </main>
+
+    <!--
+        Текст под калькулятором. Лежит ниже сгиба: первый экран не меняется, а поиску
+        и человеку есть что прочитать, кроме подписей контролов. Объём намеренно
+        небольшой — раздувание текста Яндекс называет отдельным нарушением.
+    -->
+    <section class="about">
+        <h2>Что такое очки FINA</h2>
+        <p>
+            Очки FINA переводят результат заплыва в одно число, которое можно сравнить между
+            дистанциями, стилями и бассейнами. После переименования федерации в 2023 году
+            система официально называется <b>World Aquatics Points</b>, но искать её продолжают
+            по старому имени, и здесь оно сохранено.
+        </p>
+        <p>
+            Считается так: <code>P = 1000 · (B / T)³</code>, где <code>T</code> — ваше время в
+            секундах, а <code>B</code> — базовое время дистанции. Ровно 1000 очков даёт результат,
+            равный базовому времени; вдвое медленнее — 125 очков, а не 500, потому что зависимость
+            кубическая.
+        </p>
+
+        <h2>Базовые времена и почему у них есть срок</h2>
+        <p>
+            Базовое время — это мировой рекорд, утверждённый на дату начала действия таблицы.
+            Таблицы обновляются раздельно: <b>25 м — каждое 1 сентября</b>, <b>50 м — каждое
+            1 января</b>. Калькулятор считает по редакции
+            <span id="about-scm">SCM (25 м) 2026</span> и
+            <span id="about-lcm">LCM (50 м) 2026</span>;
+            <a href="https://www.worldaquatics.com/swimming/points" rel="nofollow noopener">официальные
+            таблицы публикует World Aquatics</a>.
+        </p>
+        <p>
+            Поэтому одно и то же время в бассейне 25 м и 50 м даёт разные очки: короткая вода
+            даёт вдвое больше поворотов, и базовые времена для неё быстрее.
+        </p>
+
+        <h2>Очки и разряд — не одно и то же</h2>
+        <p>
+            Под результатом калькулятор подписывает разряд ЕВСК, который это время закрывает,
+            по приказу Минспорта № 1092. Очки при этом остаются международной шкалой сравнения
+            и статуса не дают: разряд присваивают по протоколу соревнования. Полные таблицы
+            нормативов и страницы отдельных дистанций живут на
+            <a href="https://razryad.borozdov.ru/">razryad.borozdov.ru</a>.
+        </p>
+    </section>
 
     <!-- Modal PWA Install Guide -->
     <div id="install-modal" class="modal-overlay">
