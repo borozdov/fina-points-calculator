@@ -45,9 +45,53 @@ const RANK_STROKE = {
     Medley: 'medley'
 };
 
+const STROKE_BY_SLUG = Object.fromEntries(Object.entries(RANK_STROKE).map(([k, v]) => [v, k]));
+
 export function rankSiteUrl(pool, eventKey) {
     const m = String(eventKey || '').match(/^(\d+)m (.*)$/);
     const stroke = m && RANK_STROKE[m[2]];
     if (!stroke) return null;
     return `https://razryad.borozdov.ru/normativy/${pool.toLowerCase()}/${stroke}/${m[1]}/`;
+}
+
+/*
+  Результат как адрес.
+
+  До этого в URL жил только ?mode=, а кнопка «поделиться» отправляла голый
+  https://fina.borozdov.ru — получатель открывал пустой калькулятор и не видел того, чем
+  с ним поделились. Словарь тот же, что у адресов страниц: pool, stroke, дистанция.
+
+  Форма состояния совпадает с той, что уже умеет loadState (избранное восстанавливается ею
+  же), поэтому ссылка не заводит второго способа описать результат.
+*/
+export function resultQuery(raw) {
+    const m = String(raw?.eventKey || '').match(/^(\d+)m (.*)$/);
+    if (!m || !RANK_STROKE[m[2]] || !raw.value) return null;
+    const params = new URLSearchParams({
+        pool: raw.pool.toLowerCase(),
+        sex: raw.gender === 'Women' ? 'f' : 'm',
+        stroke: RANK_STROKE[m[2]],
+        d: m[1],
+        mode: raw.mode
+    });
+    params.set(raw.mode === 'time' ? 't' : 'p', String(raw.value));
+    return params.toString();
+}
+
+/** Null для всего, чего словарь не покрывает: битая ссылка открывает калькулятор как обычно. */
+export function resultFromQuery(search) {
+    const q = new URLSearchParams(search);
+    const pool = q.get('pool') === 'lcm' ? 'LCM' : q.get('pool') === 'scm' ? 'SCM' : null;
+    const stroke = STROKE_BY_SLUG[q.get('stroke')];
+    const distance = q.get('d');
+    const mode = q.get('mode') === 'points' ? 'points' : 'time';
+    const value = Number(q.get(mode === 'time' ? 't' : 'p'));
+    if (!pool || !stroke || !distance || !Number.isFinite(value) || value <= 0) return null;
+    return {
+        pool,
+        gender: q.get('sex') === 'f' ? 'Women' : 'Men',
+        mode,
+        eventKey: `${distance}m ${stroke}`,
+        value
+    };
 }

@@ -182,12 +182,14 @@ export class ShareManager {
     }
 
     static async shareResult(data, onToast) {
-        const { timeStr, ptsStr, eventStr, rank, themeConfig } = data;
+        const { timeStr, ptsStr, eventStr, rank, url, themeConfig } = data;
 
         try {
             const blob = await this.drawShareImage(timeStr, ptsStr, eventStr, rank, themeConfig);
             const file = new File([blob], 'fina_result.png', { type: 'image/png' });
-            const text = `Смотри мой результат: ${eventStr}. Рассчитано в FINA Points by Borozdov.\n\nhttps://fina.borozdov.ru`;
+            // Ссылка на сам результат, а не на домен: иначе получатель открывал пустой
+            // калькулятор и не видел того, чем с ним поделились.
+            const text = `Смотри мой результат: ${eventStr}. Рассчитано в FINA Points by Borozdov.\n\n${url || 'https://fina.borozdov.ru'}`;
 
             if (this.isNative()) {
                 await this.nativeShare(blob, text);

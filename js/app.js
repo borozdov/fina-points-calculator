@@ -1,5 +1,5 @@
 import { BT, RU, STYLE_ORDER, STYLE_RU } from './data/constants.js';
-import { fmt, parseT, parseEventInfo, rankSiteUrl } from './helpers/utils.js';
+import { fmt, parseT, parseEventInfo, rankSiteUrl, resultFromQuery, resultQuery } from './helpers/utils.js';
 import { Calculator } from './core/Calculator.js';
 import { StorageManager } from './core/Storage.js';
 import { ShareManager } from './ui/Share.js';
@@ -50,6 +50,14 @@ class App {
     // висит переключение форм и подсветка активного. Флаг _restoring гасит цель
     // Метрики — это не выбор пользователя.
     applyModeFromUrl() {
+        // Полная ссылка на результат: восстанавливаем событие и значение целиком.
+        const shared = resultFromQuery(location.search);
+        if (shared) {
+            this.loadState(shared);
+            this.goal('open_shared_result');
+            return;
+        }
+
         const mode = new URLSearchParams(location.search).get('mode');
         if (mode !== 'time' && mode !== 'points') return;
         if (mode === this.state.curMode) return;
@@ -57,6 +65,21 @@ class App {
         this._restoring = true;
         document.querySelector(`.mode-seg .seg-btn[data-mode="${mode}"]`)?.click();
         this._restoring = false;
+    }
+
+    /** Адрес текущего результата: то, что уходит в шеринг вместо голого домена. */
+    resultUrl(type) {
+        const value = type === 'time'
+            ? Number(this.pIn.value)
+            : (this.tQ.value.trim() ? parseT(this.tQ.value) : this.fieldT());
+        const query = resultQuery({
+            pool: this.state.pool,
+            gender: this.state.gender,
+            mode: type === 'time' ? 'points' : 'time',
+            eventKey: this.state.curEvent,
+            value
+        });
+        return query ? `https://fina.borozdov.ru/?${query}` : 'https://fina.borozdov.ru';
     }
 
     goal(name, params) {
@@ -625,7 +648,8 @@ class App {
 
         const isLight = document.documentElement.getAttribute('data-theme') === 'light';
         const themeConfig = { pool, isLight, primary: type };
-        ShareManager.shareResult({ timeStr, ptsStr, eventStr, rank, themeConfig }, (msg) => this.showToast(msg));
+        const url = this.resultUrl(type);
+        ShareManager.shareResult({ timeStr, ptsStr, eventStr, rank, url, themeConfig }, (msg) => this.showToast(msg));
     }
 }
 
