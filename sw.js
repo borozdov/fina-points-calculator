@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fina-calc-v28';
+const CACHE_NAME = 'fina-calc-v29';
 
 // Всё, что нужно приложению офлайн. Список заодно служит белым списком для
 // runtime-кэша (см. isCacheable) — иначе кэш растёт бесконтрольно.
