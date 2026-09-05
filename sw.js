@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fina-calc-v29';
+const CACHE_NAME = 'fina-calc-v30';
 
 // Всё, что нужно приложению офлайн. Список заодно служит белым списком для
 // runtime-кэша (см. isCacheable) — иначе кэш растёт бесконтрольно.
@@ -29,6 +29,8 @@ const ASSETS_TO_CACHE = [
     '/assets/img/apple-touch-icon.png',
     '/qr/',
     '/css/pages.css',
+    '/assets/img/icon.svg',
+    '/assets/img/og-card.png',
     '/bazovye-vremena/',
     '/ochki-i-razryady/',
     '/tablica-ochkov/',
