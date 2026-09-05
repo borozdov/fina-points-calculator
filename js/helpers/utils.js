@@ -5,9 +5,16 @@ export function parseEventInfo(k) {
     return { style: m ? m[2] : '', dist: m ? m[1] : '', label: m ? (m[1] + 'м') : k };
 }
 
+/*
+  Округляем время целиком и только потом делим на минуты. Раздельное округление разрядов
+  теряет перенос: у 145.9986 сотые округлялись в 100, а секунды оставались 25, и время
+  печаталось как «2:25.100» вместо «2:26.00». Ломалось 0.47% результатов режима «очки →
+  время», и parseT такую строку обратно уже не читал. formatTime в виджете считает так же.
+*/
 export function fmt(s) {
     if (s < 0 || !isFinite(s)) return '—';
-    const m = Math.floor(s / 60), sec = Math.floor(s % 60), h = Math.round((s % 1) * 100);
+    const c = Math.round(s * 100);
+    const m = Math.floor(c / 6000), sec = Math.floor(c / 100) % 60, h = c % 100;
     return m > 0
         ? `${m}:${String(sec).padStart(2, '0')}.${String(h).padStart(2, '0')}`
         : `${sec}.${String(h).padStart(2, '0')}`;
