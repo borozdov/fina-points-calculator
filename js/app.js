@@ -1,5 +1,5 @@
 import { BT, RU, STYLE_ORDER, STYLE_RU } from './data/constants.js';
-import { fmt, parseT, parseEventInfo } from './helpers/utils.js';
+import { fmt, parseT, parseEventInfo, rankSiteUrl } from './helpers/utils.js';
 import { Calculator } from './core/Calculator.js';
 import { StorageManager } from './core/Storage.js';
 import { ShareManager } from './ui/Share.js';
@@ -352,8 +352,7 @@ class App {
         this.rPts.classList.toggle('ok', val !== null);
 
         const rank = val !== null ? Calculator.getRank(this.state.pool, this.state.gender, this.state.curEvent, t) : "";
-        this.rPtsRank.textContent = rank;
-        this.rPtsRank.classList.toggle('show', !!rank);
+        this.showRank(this.rPtsRank, rank);
 
         this.updateStars();
     }
@@ -381,8 +380,7 @@ class App {
         if (!this._firedCalcPoints) { this._firedCalcPoints = true; trackGoal('calc_points_to_time'); }
 
         const rank = Calculator.getRank(this.state.pool, this.state.gender, this.state.curEvent, t);
-        this.rTimeRank.textContent = rank;
-        this.rTimeRank.classList.toggle('show', !!rank);
+        this.showRank(this.rTimeRank, rank);
 
         this.updateStars();
     }
@@ -474,6 +472,22 @@ class App {
         if (this.state.curMode === 'time') this.autoCalcPoints();
         else this.autoCalcTime();
         this.updateBaseTime();
+    }
+
+    /*
+      Плашка разряда — ссылка на ту же дистанцию на razryad.borozdov.ru. Нормативы там
+      живут полностью, здесь они только подпись под очками. shareResult читает textContent,
+      и внутри ссылки он остаётся тем же самым.
+    */
+    showRank(node, rank) {
+        if (!node) return;
+        const url = rank ? rankSiteUrl(this.state.pool, this.state.curEvent) : null;
+        if (rank && url) {
+            node.innerHTML = `<a href="${url}" rel="noopener">${rank}</a>`;
+        } else {
+            node.textContent = rank;
+        }
+        node.classList.toggle('show', !!rank);
     }
 
     // Базовое время, а не мировой рекорд: это и есть та секунда, из которой считается
