@@ -1,5 +1,4 @@
 import { BT, RU, STYLE_ORDER, STYLE_RU } from './data/constants.js';
-import { WR } from './data/world_records.js';
 import { fmt, parseT, parseEventInfo } from './helpers/utils.js';
 import { Calculator } from './core/Calculator.js';
 import { StorageManager } from './core/Storage.js';
@@ -469,13 +468,18 @@ class App {
     triggerCalc() {
         if (this.state.curMode === 'time') this.autoCalcPoints();
         else this.autoCalcTime();
-        this.updateWR();
+        this.updateBaseTime();
     }
 
-    updateWR() {
+    // Базовое время, а не мировой рекорд: это и есть та секунда, из которой считается
+    // ровно 1000 очков. Совпадает с рекордом на дату начала периода действия таблицы и
+    // расходится с ним по мере того, как рекорды падают, поэтому названо честно.
+    updateBaseTime() {
         const { pool, gender, curEvent } = this.state;
-        const record = WR[pool]?.[gender]?.[curEvent];
-        const text = record ? `WR: <span class="wr-val">${fmt(record)}</span>` : '';
+        const base = BT[pool]?.[gender]?.[curEvent];
+        const text = base
+            ? `1000 очков: <span class="wr-val">${fmt(base)}</span>`
+            : '';
         if (this.rPtsWr) this.rPtsWr.innerHTML = text;
         if (this.rTimeWr) this.rTimeWr.innerHTML = text;
     }
