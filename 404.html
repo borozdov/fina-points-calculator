@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <!-- Сервер отдаёт эту страницу на любой неизвестный адрес, какой бы глубины он ни был:
+         без base относительные пути к стилям считались бы от него, а не от корня. -->
+    <base href="/">
+    <title>404 — страница не найдена | FINA Points</title>
+    <!-- Отдаётся со статусом 404, но noindex не лишний: страница не должна попасть в
+         индекс, даже если её когда-нибудь откроют по прямому адресу /404.html. -->
+    <meta name="robots" content="noindex">
+    <link rel="icon" href="/favicon.ico" sizes="32x32">
+    <link rel="icon" href="assets/img/icon.svg" type="image/svg+xml">
+    <meta name="theme-color" id="meta-theme-color" content="#0d0d0d">
+    <meta name="color-scheme" content="dark light">
+    <script>
+        // Тот же лик, что выбран в приложении: сохранённый выбор, иначе система.
+        (function () {
+            try {
+                var stored = localStorage.getItem('fina_lik');
+                var theme = (stored === 'dark' || stored === 'light')
+                    ? stored
+                    : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+                document.documentElement.setAttribute('data-theme', theme);
+                var mt = document.getElementById('meta-theme-color');
+                if (mt) mt.content = theme === 'light' ? '#fafafa' : '#0d0d0d';
+            } catch (e) { }
+        })();
+    </script>
+    <!-- Токены обоих ликов и шрифты берутся из стилей приложения: цветов вне
+         style.css нет и здесь. Ниже только раскладка этой страницы. -->
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body.not-found {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: auto;
+            min-height: 100vh;
+            min-height: 100dvh;
+            margin: 0;
+            padding: 2rem 1rem;
+            overflow: auto;
+            text-align: center;
+            background: var(--canvas);
+            color: var(--text);
+            font-family: var(--font);
+        }
+
+        .not-found__code {
+            font-family: var(--mono);
+            font-variant-numeric: tabular-nums;
+            font-weight: 700;
+            font-size: clamp(5rem, 20vw, 10rem);
+            line-height: 1;
+        }
+
+        .not-found__label {
+            margin: 1.5rem 0 0;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--slate);
+        }
+
+        .not-found__link {
+            display: inline-block;
+            margin-top: 3rem;
+            padding: 0.875rem 1.5rem;
+            border-radius: 4px;
+            background: var(--text);
+            color: var(--canvas);
+            font-size: 0.875rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: filter var(--tr);
+        }
+
+        @media (hover: hover) {
+            .not-found__link:hover {
+                filter: brightness(0.85);
+            }
+        }
+    </style>
+</head>
+
+<body class="not-found">
+    <div class="not-found__code">404</div>
+    <h1 class="not-found__label">Страница не найдена</h1>
+    <a class="not-found__link" href="/">К калькулятору</a>
+</body>
+
+</html>
