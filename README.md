@@ -19,7 +19,7 @@
 
 ## Excel
 
-[excel/fina-points-calculator.xlsx](excel/fina-points-calculator.xlsx) — тот же расчёт в Excel: калькулятор со списками и протокол на много спортсменов. После смены базовых времён в `js/data/constants.js` пересоберите файл: `python3 scripts/build-excel.py`.
+[excel/fina-points-calculator.xlsx](excel/fina-points-calculator.xlsx) — тот же расчёт в Excel: калькулятор со списками и протокол на много спортсменов, с очками, разрядом и нормативом следующего разряда. После смены базовых времён в `js/data/constants.js` или нормативов в `js/data/standards.js` пересоберите файл: `python3 scripts/build-excel.py`.
 
 ## Технологии
 

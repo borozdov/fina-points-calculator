@@ -103,6 +103,63 @@ def parse_time(c):
             f'VALUE(LEFT({s},FIND(":",{s})-1))*60+_xlfn.NUMBERVALUE(MID({s},FIND(":",{s})+1,99),"."),'
             f'_xlfn.NUMBERVALUE({s},".")),0))')
 
+# --- Нормативы ЕВСК: тот же js/data/standards.js, что подписывает разряд на сайте ---
+import json
+std_text = (ROOT / 'js/data/standards.js').read_text(encoding='utf8')
+std_json = std_text[std_text.index('{', std_text.index('export const STANDARDS')):]
+STANDARDS = json.loads(std_json[:std_json.rindex('}') + 1])
+RANKS = ['МСМК', 'МС', 'КМС', 'I', 'II', 'III', 'I юн', 'II юн', 'III юн']
+RANK_NAME = {'МСМК': 'МСМК', 'МС': 'МС', 'КМС': 'КМС', 'I': 'I разряд', 'II': 'II разряд', 'III': 'III разряд',
+             'I юн': 'I юношеский', 'II юн': 'II юношеский', 'III юн': 'III юношеский'}
+def seconds(v):
+    m, _, rest = v.rpartition(':')
+    return round((int(m) * 60 if m else 0) + float(rest), 2)
+
+std = wb.create_sheet('Нормативы')
+std.append(['Бассейн', 'Пол', 'Дистанция'] + [RANK_NAME[r] for r in RANKS] + ['Ключ'])
+std_rows = 0
+for p, pru in POOLS:
+    for g, gru in GENDERS:
+        events = STANDARDS[gru == 'Мужчины' and 'men' or 'women'][p == 'SCM' and '25m' or '50m']
+        for ev in ORDER:
+            d, st = ev.split('m ')
+            times = events.get(f'{d}, {STYLE[st]}')
+            if not times:
+                continue
+            std_rows += 1
+            r = std_rows + 1
+            std.append([pru, gru, ru(ev)] + [seconds(times[k]) if k in times else None for k in RANKS] + [f'=A{r}&"|"&B{r}&"|"&C{r}'])
+            for c in range(4, 13):
+                std.cell(r, c).number_format = '0.00'
+            std.cell(r, 13).font = muted
+assert std_rows == 70, std_rows
+std_note = std_rows + 3
+std[f'A{std_note}'] = 'Разрядные нормативы ЕВСК по плаванию: приказ Минспорта России от 06.11.2024 № 1092, действует с 26.11.2024. Время в секундах.'
+std[f'A{std_note + 1}'] = 'http://publication.pravo.gov.ru/document/0001202411150002'
+for c in (std_note, std_note + 1): std[f'A{c}'].font = muted
+
+STD = f"'Нормативы'!$D$2:$L${std_rows + 1}"
+STD_HEAD = "'Нормативы'!$D$1:$L$1"
+STD_KEY = f"'Нормативы'!$M$2:$M${std_rows + 1}"
+
+def std_row(pool, gender, ev):
+    """Строка нормативов дистанции; ошибка, если нормативов нет (100 м комплекс в 50 м)."""
+    return f'MATCH({pool}&"|"&{gender}&"|"&{ev},{STD_KEY},0)'
+
+def unmet(row, t):
+    """Сколько разрядов время не закрывает. Нормативы идут от МСМК к III юн без пропусков."""
+    return f'SUMPRODUCT((INDEX({STD},{row},0)<{t})*ISNUMBER(INDEX({STD},{row},0)))'
+
+def rank_name(row, k):
+    return f'IF({k}+1>COUNT(INDEX({STD},{row},0)),"Разряда нет",INDEX({STD_HEAD},1,{k}+1))'
+
+def next_rank_name(k):
+    """Самый медленный из невыполненных — как на сайте и на razryad.borozdov.ru."""
+    return f'IF({k}=0,"—",INDEX({STD_HEAD},1,{k}))'
+
+def next_rank_time(row, k):
+    return f'IF({k}=0,"",' + fmt_time(f'INDEX({STD},{row},{k})') + ')'
+
 # Списки для выпадающих меню
 lists = wb.create_sheet('Списки')
 lists['A1'] = 'Бассейн'; lists['B1'] = 'Пол'; lists['C1'] = 'Дистанция'
@@ -154,21 +211,37 @@ calc['C12'].font = muted
 calc['B12'].number_format = '0.00'; calc['B13'].number_format = '0.00'
 for r in (11, 12, 13): calc[f'B{r}'].alignment = Alignment(horizontal='right')
 
-calc['A16'] = 'Обратный расчёт'; calc['A16'].font = bold
-field(calc, 17, 'Нужные очки', 700, dv_pts)
-calc['A18'] = 'Нужное время'; calc['A18'].font = bold
-calc['C18'] = '=IF(OR(B12=0,N(B17)<=0),"",' + slowest_time('B12', 'B17') + ')'
-calc['B18'] = '=IF(C18="","",' + fmt_time('C18') + ')'
-calc['B18'].font = Font(name=F, size=16, bold=True); calc['B18'].alignment = Alignment(horizontal='right')
-calc['C18'].font = muted; calc['C18'].number_format = '0.00'
+# Служебные ячейки разряда в скрытом столбце E: строка нормативов и число невыполненных
+calc['E15'] = '=IFERROR(' + std_row('$B$4', '$B$5', '$B$6') + ',"")'
+calc['E16'] = '=IF(OR(E15="",B13=""),"",' + unmet('E15', 'B13') + ')'
+calc.column_dimensions['E'].hidden = True
+calc['A15'] = 'Разряд'; calc['A15'].font = bold
+calc['B15'] = '=IF(E16="","",' + rank_name('E15', 'E16') + ')'
+calc['A16'] = 'Следующий разряд'
+calc['B16'] = '=IF(E16="","",' + next_rank_name('E16') + ')'
+calc['A17'] = 'Его норматив'
+calc['B17'] = '=IF(E16="","",' + next_rank_time('E15', 'E16') + ')'
+calc['B15'].font = Font(name=F, size=12, bold=True)
+calc['C15'] = '=IF(AND(B13<>"",E15=""),"Разрядных нормативов на этой дистанции нет","")'
+calc['C15'].font = muted
+for r in (15, 16, 17): calc[f'B{r}'].alignment = Alignment(horizontal='right')
 
-calc['A20'] = 'Формула: очки = 1000 × (базовое время / время)³, дробная часть отбрасывается.'
-calc['A21'] = 'Сайт: https://fina.borozdov.ru — тот же расчёт.'
-for c in ('A20', 'A21'): calc[c].font = muted
+calc['A19'] = 'Обратный расчёт'; calc['A19'].font = bold
+field(calc, 20, 'Нужные очки', 700, dv_pts)
+calc['A21'] = 'Нужное время'; calc['A21'].font = bold
+calc['C21'] = '=IF(OR(B12=0,N(B20)<=0),"",' + slowest_time('B12', 'B20') + ')'
+calc['B21'] = '=IF(C21="","",' + fmt_time('C21') + ')'
+calc['B21'].font = Font(name=F, size=16, bold=True); calc['B21'].alignment = Alignment(horizontal='right')
+calc['C21'].font = muted; calc['C21'].number_format = '0.00'
+
+calc['A23'] = 'Формула: очки = 1000 × (базовое время / время)³, дробная часть отбрасывается.'
+calc['A24'] = 'Разряд — по нормативам ЕВСК (лист «Нормативы»). Сайт: https://fina.borozdov.ru — тот же расчёт.'
+for c in ('A23', 'A24'): calc[c].font = muted
 
 # --- Протокол ---
 prot = wb.create_sheet('Протокол', 1)
-ph = ['Спортсмен', 'Бассейн', 'Пол', 'Дистанция', 'Время', 'Очки FINA', 'Базовое время, с', 'Время, с']
+ph = ['Спортсмен', 'Бассейн', 'Пол', 'Дистанция', 'Время', 'Очки FINA', 'Разряд', 'Следующий разряд', 'Его норматив',
+      'Базовое время, с', 'Время, с', 'Строка нормативов', 'Не закрыто разрядов']
 prot.append(ph)
 example = [('Иванов Иван', '25 м', 'Мужчины', '100 м вольный стиль', '50.12'),
            ('Петрова Анна', '50 м', 'Женщины', '200 м комплекс', '2:21.40')]
@@ -181,36 +254,44 @@ for r in range(2, N + 2):
         prot[f'{col}{r}'].fill = input_fill
         prot[f'{col}{r}'].border = box
     prot[f'E{r}'].number_format = '@'
-    prot[f'G{r}'] = f'=IF(D{r}="","",' + base_lookup(f'B{r}', f'C{r}', f'D{r}') + ')'
-    prot[f'H{r}'] = f'=IF(E{r}="","",' + parse_time(f'E{r}') + ')'
-    prot[f'F{r}'] = f'=IF(OR(G{r}="",H{r}="",N(G{r})=0,N(H{r})<=0),"",ROUNDDOWN(1000*(G{r}/H{r})^3,0))'
-    prot[f'F{r}'].font = bold
-    prot[f'G{r}'].number_format = '0.00'; prot[f'H{r}'].number_format = '0.00'
-    for col in 'GH':
+    prot[f'J{r}'] = f'=IF(D{r}="","",' + base_lookup(f'B{r}', f'C{r}', f'D{r}') + ')'
+    prot[f'K{r}'] = f'=IF(E{r}="","",' + parse_time(f'E{r}') + ')'
+    prot[f'F{r}'] = f'=IF(OR(J{r}="",K{r}="",N(J{r})=0,N(K{r})<=0),"",ROUNDDOWN(1000*(J{r}/K{r})^3,0))'
+    prot[f'L{r}'] = f'=IF(OR(D{r}="",N(K{r})<=0),"",IFERROR(' + std_row(f'B{r}', f'C{r}', f'D{r}') + ',""))'
+    prot[f'M{r}'] = f'=IF(L{r}="","",' + unmet(f'L{r}', f'K{r}') + ')'
+    prot[f'G{r}'] = f'=IF(M{r}="","",' + rank_name(f'L{r}', f'M{r}') + ')'
+    prot[f'H{r}'] = f'=IF(M{r}="","",' + next_rank_name(f'M{r}') + ')'
+    prot[f'I{r}'] = f'=IF(M{r}="","",' + next_rank_time(f'L{r}', f'M{r}') + ')'
+    prot[f'F{r}'].font = bold; prot[f'G{r}'].font = bold
+    prot[f'I{r}'].alignment = Alignment(horizontal='right')
+    prot[f'J{r}'].number_format = '0.00'; prot[f'K{r}'].number_format = '0.00'
+    for col in 'JKLM':
         prot[f'{col}{r}'].font = muted
 for dv, col in ((dv_pool(), 'B'), (dv_g(), 'C'), (dv_ev(), 'D')):
     dv.add(f'{col}2:{col}{N + 1}'); prot.add_data_validation(dv)
 prot['F1'].comment = Comment('Пусто, если не заполнена строка или дистанции нет в этом бассейне (например, 100 м комплекс в 50 м).', 'fina.borozdov.ru')
 prot.freeze_panes = 'A2'
-prot.auto_filter.ref = f'A1:H{N + 1}'
+prot.auto_filter.ref = f'A1:M{N + 1}'
+for col in 'LM':
+    prot.column_dimensions[col].hidden = True
 
 # Шапки и шрифты
-for ws in (base, prot):
+for ws in (base, prot, std):
     for c in ws[1]:
         c.font = head_font; c.fill = head_fill; c.alignment = center
-for ws in (calc, base, prot):
+for ws in (calc, base, prot, std):
     for row in ws.iter_rows():
         for c in row:
             if c.font == Font():  # не тронутые стилем
                 c.font = font
             elif c.font.name != F:
                 c.font = Font(name=F, size=c.font.size, bold=c.font.bold, color=c.font.color)
-for ws, widths in ((calc, [20, 22, 40]), (base, [10, 12, 24, 18, 16]), (prot, [28, 10, 12, 24, 12, 12, 18, 12])):
+for ws, widths in ((calc, [20, 22, 40]), (base, [10, 12, 24, 18, 16]), (prot, [28, 10, 12, 24, 12, 12, 16, 18, 14, 18, 12]), (std, [10, 12, 24] + [13] * 9 + [10])):
     for i, w in enumerate(widths):
         ws.column_dimensions[chr(65 + i)].width = w
 
 # По частоте использования: калькулятор, протокол, справочник
-wb._sheets = [calc, prot, base, lists]
+wb._sheets = [calc, prot, base, std, lists]
 wb.active = 0
 wb.calculation.fullCalcOnLoad = True
 wb.save(OUT)
