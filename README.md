@@ -17,6 +17,10 @@
 - 🌙 Два лика: ОБСИДИАН (тёмный) и ТИТАН (светлый)
 - 📴 **Оффлайн** — работает без интернета
 
+## Excel
+
+[excel/fina-points-calculator.xlsx](excel/fina-points-calculator.xlsx) — тот же расчёт в Excel: калькулятор со списками и протокол на много спортсменов. После смены базовых времён в `js/data/constants.js` пересоберите файл: `python3 scripts/build-excel.py`.
+
 ## Технологии
 
 - Vanilla JavaScript (ES6 Modules)
