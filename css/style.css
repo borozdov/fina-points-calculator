@@ -693,6 +693,8 @@ body {
     font-weight: 500;
     letter-spacing: 0.06em;
     margin-top: 2px;
+    /* Строка пустеет без результата; высота держится, чтобы число не прыгало. */
+    min-height: 1.5em;
 }
 
 .result-wr .wr-val {

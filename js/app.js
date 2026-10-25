@@ -8,6 +8,13 @@ import { Onboarding } from './ui/Onboarding.js';
 import { syncNativeChrome } from './ui/NativeChrome.js';
 import { trackGoal } from './helpers/analytics.js';
 
+/* Голое «I» под очками читается обрывком: в подписи разряд назван так, как его говорят вслух. */
+const NEXT_RANK_LABEL = {
+    'МСМК': 'МСМК', 'МС': 'МС', 'КМС': 'КМС',
+    'I': 'I разряд', 'II': 'II разряд', 'III': 'III разряд',
+    'I юн': 'I юношеский', 'II юн': 'II юношеский', 'III юн': 'III юношеский'
+};
+
 class App {
     constructor() {
         this.state = {
@@ -376,6 +383,7 @@ class App {
 
         const rank = val !== null ? Calculator.getRank(this.state.pool, this.state.gender, this.state.curEvent, t) : "";
         this.showRank(this.rPtsRank, rank);
+        this.showNextRank(this.rPtsWr, val !== null ? t : NaN);
 
         this.updateStars();
     }
@@ -387,6 +395,7 @@ class App {
         if (isNaN(t)) {
             this.rTimeV.textContent = '—';
             this.rTime.classList.remove('ok');
+            this.showNextRank(this.rTimeWr, NaN);
             return;
         }
 
@@ -404,6 +413,7 @@ class App {
 
         const rank = Calculator.getRank(this.state.pool, this.state.gender, this.state.curEvent, t);
         this.showRank(this.rTimeRank, rank);
+        this.showNextRank(this.rTimeWr, t);
 
         this.updateStars();
     }
@@ -494,7 +504,6 @@ class App {
     triggerCalc() {
         if (this.state.curMode === 'time') this.autoCalcPoints();
         else this.autoCalcTime();
-        this.updateBaseTime();
     }
 
     // Плашка разряда — подпись под очками, и только: нормативы живут на
@@ -505,17 +514,15 @@ class App {
         node.classList.toggle('show', !!rank);
     }
 
-    // Базовое время, а не мировой рекорд: это и есть та секунда, из которой считается
-    // ровно 1000 очков. Совпадает с рекордом на дату начала периода действия таблицы и
-    // расходится с ним по мере того, как рекорды падают, поэтому названо честно.
-    updateBaseTime() {
-        const { pool, gender, curEvent } = this.state;
-        const base = BT[pool]?.[gender]?.[curEvent];
-        const text = base
-            ? `1000 очков: <span class="wr-val">${fmt(base)}</span>`
+    // Под результатом — следующий разряд и его норматив, как на razryad.borozdov.ru.
+    // Раньше здесь стояло базовое время на 1000 очков: оно одинаково для любого результата
+    // и пловцу ничего не говорило.
+    showNextRank(node, t) {
+        if (!node) return;
+        const next = Calculator.getNextRank(this.state.pool, this.state.gender, this.state.curEvent, t);
+        node.innerHTML = next
+            ? `${NEXT_RANK_LABEL[next.rank]}: <span class="wr-val">${fmt(next.time)}</span>`
             : '';
-        if (this.rPtsWr) this.rPtsWr.innerHTML = text;
-        if (this.rTimeWr) this.rTimeWr.innerHTML = text;
     }
 
     toggleFav(input, eventStr, resultStr, raw) {
